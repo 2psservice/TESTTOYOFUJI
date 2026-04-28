@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    <!-- Excel Parser Library with Style Support -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js" defer></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition shadow-lg shadow-blue-500/30;
+        }
+
+        .input-light {
+            @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        .pulse-active {
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .pulse-break {
+            animation: pulse-red 2s infinite;
+        }
+
+        /* Ship Animation */
+        @keyframes shipFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(1deg);
+            }
+
+            50% {
+                transform: translateY(-6px) rotate(-2deg);
+            }
+        }
+
+        .ship-anim {
+            animation: shipFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes waveSlide {
+            0% {
+                transform: translateX(-5px);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateX(5px);
+                opacity: 1;
+            }
+        }
+
+        .wave-anim {
+            animation: waveSlide 2s ease-in-out infinite alternate;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-slate-900 border-b border-slate-700 p-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToOverview()">
+                <img src="logo.jpg" alt="2PS 20th Anniversary" class="h-12 w-auto object-contain">
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</h1>
+                    <div class="text-xs text-slate-400 flex items-center gap-2">
+                        <span>Multi-Vessel Operation</span>
+                        <span id="connectionStatus"
+                            class="text-yellow-500 font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-yellow-900">🟡
+                            Connecting...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="goToOverview()" id="btn-dash"
+                    class="px-4 py-2 rounded bg-blue-600 text-white text-sm font-bold shadow-lg shadow-blue-500/50 transition transform hover:scale-105">
+                    <i class="fa-solid fa-desktop mr-2"></i>Monitor
+                </button>
+                <button onclick="goToAdmin()" id="btn-admin"
+                    class="px-4 py-2 rounded bg-slate-700 text-slate-300 text-sm hover:text-white hover:bg-slate-600 transition">
+                    <i class="fa-solid fa-gear mr-2"></i>Setup
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTAINER FOR DYNAMIC VIEWS -->
+    <main class="container mx-auto p-4 flex-grow">
+
+        <!-- LOADER & ERROR SCREEN -->
+        <div id="app-loader"
+            class="fixed inset-0 bg-slate-900 z-40 flex flex-col items-center justify-center text-white text-center p-6">
+            <div id="loader-spinner" class="flex flex-col items-center">
+                <!-- 20th Anniversary Logo -->
+                <div class="relative mb-8 ship-anim">
+                    <img src="logo.jpg" alt="2PS 20th Anniversary"
+                        class="h-48 w-auto object-contain drop-shadow-2xl">
+                </div>
+
+                <h2 class="text-2xl font-bold tracking-wider uppercase text-blue-100 mb-2">​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</h2>
+                <div
+                    class="flex items-center gap-2 text-slate-400 text-sm font-mono bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Online Operation System
+                </div>
+            </div>
+
+            <div id="loader-error"
+                class="hidden text-red-400 bg-slate-800 p-6 rounded-xl border border-red-900 shadow-xl max-w-md mt-4">
+                <i class="fa-solid fa-wifi text-4xl mb-3"></i>
+                <h3 class="text-lg font-bold text-white">Connection Failed</h3>
+                <p id="loader-error-msg" class="text-sm mt-2 mb-4">Cannot connect to server. Check your internet.</p>
+                <button onclick="location.reload()"
+                    class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-sm">Retry</button>
+            </div>
+        </div>
+
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
+        <div id="view-overview" class="hidden fade-in">
+            <!-- Month Filter Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <h2 class="text-2xl font-bold text-white border-l-4 border-blue-500 pl-4">Active Vessels Overview</h2>
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-600 rounded-xl px-4 py-2 shadow">
+                    <i class="fa-solid fa-calendar-days text-blue-400"></i>
+                    <label class="text-xs text-slate-400 uppercase font-bold tracking-wider">เดือน</label>
+                    <input type="month" id="monthFilterInput"
+                        class="bg-slate-700 text-white text-sm font-bold border border-slate-500 rounded-lg px-3 py-1 focus:border-blue-400 focus:outline-none cursor-pointer"
+                        onchange="window.onMonthFilterChange()">
+                    <button onclick="window.onMonthFilterChange('today')"
+                        class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded font-bold transition">
+                        ปัจจุบัน
+                    </button>
+                </div>
+            </div>
+            <div id="vesselGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- VIEW 2: VESSEL DETAIL -->
+        <div id="view-detail" class="hidden fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="goToOverview()"
+                    class="text-slate-400 hover:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Back to All Vessels
+                </button>
+                <div class="text-xs text-slate-500" id="breakSummaryText"></div>
+            </div>
+
+            <!-- Header -->
+            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 mb-6 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                            <span id="detailVesselName">Vessel Name</span>
+                            <span id="detailVesselVoy"
+                                class="text-sm bg-blue-900 text-blue-200 px-2 py-1 rounded">V.001</span>
+                        </h2>
+                        <div class="text-slate-400 text-xs mt-1">Start: <span id="detailStartTime">08:00</span></div>
+                    </div>
+                    <div class="text-right flex flex-col items-end">
+                        <div
+                            class="flex items-center gap-2 mb-1 bg-slate-900/50 px-3 py-1 rounded border border-slate-600">
+                            <span id="lblShipProduct"
+                                class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">SHIP
+                                PRODUCT</span>
+                            <span class="text-yellow-400 font-bold font-mono text-xl leading-none"
+                                id="detailShipProduct">0</span>
+                            <span class="text-[10px] text-yellow-500/70 font-bold">U/Hr</span>
+                        </div>
+                        <div class="text-2xl font-bold text-blue-400 font-mono leading-none mt-1" id="detailETC">--:--
+                        </div>
+                        <div class="text-[10px] text-slate-500 mt-1">Est. Compl (Dynamic)</div>
+                    </div>
+                </div>
+
+                <!-- PERIOD CONTROL BAR (GLOBAL) -->
+                <div class="bg-slate-900/50 rounded-xl border border-slate-600 overflow-hidden shadow-md">
+                    <div class="bg-slate-800/50 p-3 text-center border-b border-slate-700">
+                        <div id="clockTime" class="text-4xl font-bold text-blue-100 tracking-widest drop-shadow-md">
+                            --:--:--</div>
+                        <div id="clockDate" class="text-sm text-slate-400 mt-1 font-medium">Loading Date...</div>
+                    </div>
+                    <div class="p-2 bg-slate-900 text-center text-xs text-slate-500 flex justify-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span> Working Gangs
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span> On Break
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABS: LOAD vs DISCHARGE (Swapped Positions) -->
+            <div class="flex gap-2 mb-4">
+                <button onclick="switchOpMode('discharge')" id="tabDischarge"
+                    class="flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4">
+                    <i class="fa-solid fa-download mr-2"></i> Discharge (Import)
+                </button>
+                <button onclick="switchOpMode('load')" id="tabLoad"
+                    class="flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4">
+                    <i class="fa-solid fa-upload mr-2"></i> Loading (Export)
+                </button>
+            </div>
+
+            <!-- SHIP LOADING BAR -->
+            <div id="detailShipProgress" class="mb-6"></div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="glass-panel p-3 rounded-xl text-center border-t-4 border-slate-500 cursor-pointer hover:bg-slate-700/50 transition active:scale-95"
+                    onclick="showStatDetails('plan')">
+                    <div class="text-slate-400 text-[10px] uppercase font-bold">Total Plan</div>
+                    <div class="text-2xl font-bold text-white" id="detailTotal">0</div>
+                    <div class="text-[10px] text-blue-400 mt-1"><i class="fa-solid fa-list-ul mr-1"></i>Details</div>
+                </div>
+                <div class="glass-panel p-3 rounded-xl text-center border-t-4 cursor-pointer hover:bg-slate-700/50 transition active:scale-95"
+                    id="statLoadedCard" onclick="showStatDetails('loaded')">
+                    <div class="text-slate-400 text-[10px] uppercase font-bold" id="lblLoaded">Loaded</div>
+                    <div class="text-2xl font-bold" id="detailLoaded">0</div>
+                    <div class="text-[10px] text-green-400 mt-1"><i class="fa-solid fa-list-ul mr-1"></i>Details</div>
+                </div>
+                <div class="glass-panel p-3 rounded-xl text-center border-t-4 border-orange-500 cursor-pointer hover:bg-slate-700/50 transition active:scale-95"
+                    onclick="showStatDetails('remaining')">
+                    <div class="text-slate-400 text-[10px] uppercase font-bold">Remaining</div>
+                    <div class="text-2xl font-bold text-orange-400" id="detailRemaining">0</div>
+                    <div class="text-[10px] text-orange-400 mt-1"><i class="fa-solid fa-list-ul mr-1"></i>Details</div>
+                </div>
+            </div>
+
+            <!-- Gang Selector & Summary -->
+            <div class="grid md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-blue-900/30 border border-blue-500/30 p-4 rounded-xl">
+                    <label class="text-blue-300 text-xs uppercase font-bold mb-2 block">Operator / Gang</label>
+                    <select id="currentGangSelect" onchange="renderVesselDetail()"
+                        class="bg-slate-800 text-white font-bold border-2 border-blue-500 rounded-lg p-2 w-full focus:ring-blue-500">
+                        <option value="" disabled selected>-- Select Gang --</option>
+                    </select>
+                    <div id="gangStatusDisplay"
+                        class="mt-2 text-center text-xs text-white bg-slate-800 p-2 rounded hidden"></div>
+                </div>
+                <div class="md:col-span-2 glass-panel p-4 rounded-xl relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-bold">Gang Performance</div>
+                            <div class="text-[10px] text-slate-500">* Click on gang to Break/Start</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="showPeriodReport()"
+                                class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-3 py-1.5 rounded shadow flex items-center gap-2 transition">
+                                <i class="fa-solid fa-file-invoice"></i> Report
+                            </button>
+                        </div>
+                    </div>
+                    <div id="detailGangGrid" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Port Destination Summary -->
+            <div class="glass-panel p-4 rounded-xl mb-6">
+                <h3 class="text-white font-bold mb-3 border-b border-slate-600 pb-2 flex items-center">
+                    <i class="fa-solid fa-map-location-dot mr-2 text-yellow-400"></i> <span id="lblPortSummary">Port
+                        Summary</span>
+                </h3>
+                <div id="detailPortSummary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Main Table -->
+            <div class="glass-panel rounded-xl overflow-hidden shadow-lg mb-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-700 text-slate-300 uppercase text-xs">
+                            <tr>
+                                <th class="p-3 text-left text-yellow-400 min-w-[100px]" id="colPortHeader1">Port</th>
+                                <th class="p-3 text-left min-w-[100px]" id="colPortHeader2">Sec. Port</th>
+                                <th class="p-3 min-w-[70px]">Model</th>
+                                <th class="p-3 min-w-[70px]" id="colLaneHeader">Block</th>
+                                <th
+                                    class="p-3 text-center min-w-[140px] bg-blue-900/30 text-blue-300 border-x border-slate-600">
+                                    Action (+/-)</th>
+                                <th class="p-3 text-center">Plan</th>
+                                <th
+                                    class="p-3 text-center text-green-400 bg-green-900/20 border-x border-slate-600 font-bold text-sm">
+                                    Actual</th>
+                                <th class="p-3 text-center">Bal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTableBody" class="text-sm divide-y divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-slate-700">
+                <div class="p-3 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="font-bold text-white text-sm"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Operation
+                        History (Recent)</h3>
+                    <div class="text-xs text-slate-400">Shows recent loading activity</div>
+                </div>
+                <div class="max-h-60 overflow-y-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-900 text-xs uppercase sticky top-0 shadow">
+                            <tr>
+                                <th class="p-3 w-28">Time</th>
+                                <th class="p-3">Gang</th>
+                                <th class="p-3">Model</th>
+                                <th class="p-3 text-yellow-500">Port</th>
+                                <th class="p-3">Lane</th>
+                                <th class="p-3 text-right">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailHistoryBody" class="divide-y divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: ADMIN SETUP -->
+        <div id="view-admin" class="hidden fade-in">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <h2 class="text-2xl font-bold text-white border-l-4 border-purple-500 pl-4">System Setup</h2>
+                <button onclick="logoutAdmin()"
+                    class="text-red-400 text-xs hover:text-red-500 border border-red-500/50 px-3 py-1 rounded">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout Admin
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Settings -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl text-black shadow-lg shadow-slate-900/50 h-fit">
+                        <h3 class="text-lg font-bold mb-4 text-blue-800 border-b pb-2"><i
+                                class="fa-solid fa-ship mr-2"></i>1. Manage Vessels</h3>
+                        <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
+                            <div class="space-y-2">
+                                <input type="text" id="newVesName" class="input-light" placeholder="Vessel Name">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="newVesVoy" class="input-light" placeholder="Voyage No.">
+                                    <input type="time" id="newVesTime" class="input-light" value="08:00">
+                                </div>
+                                <button onclick="addNewVessel()"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow"><i
+                                        class="fa-solid fa-plus"></i> Create Vessel</button>
+                            </div>
+                        </div>
+                        <ul id="adminVesselList" class="space-y-2 max-h-60 overflow-y-auto"></ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl text-black shadow-lg shadow-slate-900/50 h-fit">
+                        <h3 class="text-lg font-bold mb-4 text-orange-700 border-b pb-2"><i
+                                class="fa-solid fa-mug-hot mr-2"></i>4. Global Break Time Schedule</h3>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="breakName" class="input-light w-1/3" placeholder="Name (P1)">
+                            <input type="time" id="breakStart" class="input-light w-1/3">
+                            <input type="time" id="breakEnd" class="input-light w-1/3">
+                        </div>
+                        <button onclick="addBreak()"
+                            class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-1 px-4 rounded shadow mb-3 text-sm">Add
+                            Break Period</button>
+                        <ul id="adminBreakList" class="space-y-1 max-h-40 overflow-y-auto border-t pt-2"></ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl text-black shadow-lg shadow-slate-900/50 h-fit">
+                        <h3 class="text-lg font-bold mb-4 text-teal-700 border-b pb-2"><i
+                                class="fa-solid fa-palette mr-2"></i>5. Manage Port Colors</h3>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="portColorName" class="input-light w-2/3"
+                                placeholder="Port Name (e.g. JAPAN)">
+                            <input type="color" id="portColorPicker" class="h-10 w-1/3 cursor-pointer" value="#22c55e">
+                        </div>
+                        <button onclick="savePortColor()"
+                            class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-4 rounded shadow mb-3 text-sm">Save
+                            Color</button>
+                        <ul id="adminPortColorList" class="space-y-1 max-h-40 overflow-y-auto border-t pt-2"></ul>
+                    </div>
+                </div>
+
+                <!-- Stock & Gangs -->
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white p-6 rounded-xl text-black shadow-lg shadow-slate-900/50">
+                        <h3 class="text-lg font-bold mb-4 text-green-800 border-b pb-2"><i
+                                class="fa-solid fa-layer-group mr-2"></i>2. Manage Stock</h3>
+                        <div class="flex justify-between items-end mb-4 gap-2">
+                            <div class="flex-grow">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Select Vessel to Edit:</label>
+                                <select id="adminVesselSelect" onchange="window.handleAdminVesselChange()"
+                                    class="w-full p-2 border-2 border-green-500 rounded bg-green-50 font-bold text-gray-800">
+                                    <option value="">-- No Vessel --</option>
+                                </select>
+                            </div>
+                            <div class="shrink-0">
+                                <input type="file" id="excelUpload" accept=".xlsx, .xls" class="hidden"
+                                    onchange="handleExcelUpload()">
+                                <button onclick="document.getElementById('excelUpload').click()"
+                                    class="bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 px-4 rounded shadow flex items-center text-sm border border-green-900">
+                                    <i class="fa-solid fa-file-excel mr-2 text-white"></i> Import Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 mb-2 bg-gray-100 p-2 rounded">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="stockType" value="load" checked
+                                    onchange="updateAdminStockForm(); renderAdminStockTable()">
+                                <span class="text-sm font-bold text-blue-700">Loading (Export)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="stockType" value="discharge"
+                                    onchange="updateAdminStockForm(); renderAdminStockTable()">
+                                <span class="text-sm font-bold text-pink-600">Discharge (Import)</span>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4 bg-gray-100 p-3 rounded border">
+                            <input type="text" id="addModel" class="input-light col-span-1" placeholder="Model">
+                            <input type="text" id="addPort" class="input-light col-span-1"
+                                placeholder="Port 1 (Disch/Load)">
+                            <input type="text" id="addPort2" class="input-light col-span-1"
+                                placeholder="Port 2 (Final/Disch)">
+                            <input type="text" id="addLane" class="input-light col-span-1" placeholder="Block/Deck">
+                            <input type="number" id="addPlan" class="input-light col-span-1" placeholder="Qty">
+                            <button onclick="addStockItem()"
+                                class="bg-green-600 text-white font-bold rounded shadow col-span-1">Add</button>
+                        </div>
+                        <div class="overflow-x-auto border rounded-lg h-80 overflow-y-auto">
+                            <table class="w-full text-left text-sm text-gray-800">
+                                <thead class="bg-gray-200 text-xs uppercase sticky top-0">
+                                    <tr>
+                                        <th class="p-3">Type</th>
+                                        <th class="p-3">Model</th>
+                                        <th class="p-3">Port 1</th>
+                                        <th class="p-3">Port 2</th>
+                                        <th class="p-3 text-right">Plan</th>
+                                        <th class="p-3 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminStockBody" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl text-black shadow-lg shadow-slate-900/50 h-fit">
+                            <h3
+                                class="text-lg font-bold mb-4 text-purple-800 border-b pb-2 flex justify-between items-center">
+                                <span><i class="fa-solid fa-users-gear mr-2"></i>3. Manage Gangs</span>
+                                <span id="adminGangVesselName"
+                                    class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded hidden"></span>
+                            </h3>
+                            <div class="flex gap-2 mb-4">
+                                <input type="text" id="newGangName" class="input-light"
+                                    placeholder="New Gang Name (Global)">
+                                <button onclick="addNewGang()"
+                                    class="bg-purple-600 text-white font-bold px-4 rounded shadow"><i
+                                        class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <div class="text-[10px] text-gray-500 mb-2" id="adminGangHelpText">
+                                <i class="fa-solid fa-circle-info mr-1"></i> Select a vessel above to assign/enable
+                                gangs.
+                            </div>
+                            <ul id="adminGangList" class="space-y-1 max-h-48 overflow-y-auto relative min-h-[50px]">
+                            </ul>
+                        </div>
+
+                        <!-- Admin Security Section -->
+                        <div class="bg-slate-700 p-6 rounded-xl text-white shadow-lg h-fit border border-slate-600">
+                            <h3 class="text-lg font-bold mb-4 text-yellow-400 border-b border-slate-500 pb-2"><i
+                                    class="fa-solid fa-shield-halved mr-2"></i>Admin Security</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Change Username</label>
+                                    <input type="text" id="changeAdminUser"
+                                        class="bg-slate-800 border border-slate-500 text-white text-sm rounded-lg block w-full p-2">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Change Password</label>
+                                    <input type="password" id="changeAdminPass"
+                                        class="bg-slate-800 border border-slate-500 text-white text-sm rounded-lg block w-full p-2"
+                                        placeholder="New Password">
+                                </div>
+                                <button onclick="saveAdminConfig()"
+                                    class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 rounded shadow mt-2">Update
+                                    Credentials</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Data -->
+                <div class="md:col-span-3 text-right">
+                    <button onclick="hardReset()" class="text-red-500 text-xs hover:text-red-700 underline">Factory
+                        Reset (Clear All)</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-slate-600 text-xs py-4 mt-auto">
+        &copy; 2026 2PS VESSEL OPERATION V8.6 (Vessel Specific Gangs)
+    </footer>
+
+    <!-- MODALS -->
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal"
+        class="hidden fixed inset-0 z-[200] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
+            <div class="text-center mb-6">
+                <div
+                    class="bg-slate-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-slate-500">
+                    <i class="fa-solid fa-user-shield text-3xl text-blue-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Admin Login</h3>
+                <p class="text-slate-400 text-xs mt-1">Restricted Access</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Username</label>
+                    <input type="text" id="adminLoginUser"
+                        class="bg-slate-900 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 focus:border-blue-500 outline-none"
+                        placeholder="Enter username">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Password</label>
+                    <input type="password" id="adminLoginPass"
+                        class="bg-slate-900 border border-slate-600 text-white text-sm rounded-lg block w-full p-2.5 focus:border-blue-500 outline-none"
+                        placeholder="Enter password" onkeypress="if(event.key==='Enter') attemptAdminLogin()">
+                </div>
+                <div id="loginErrorMsg" class="text-red-500 text-xs text-center hidden">Invalid credentials</div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <button onclick="closeAdminLogin()"
+                        class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded font-bold text-sm">Cancel</button>
+                    <button onclick="attemptAdminLogin()"
+                        class="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold text-sm shadow-lg shadow-blue-500/20">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editStockModal"
+        class="hidden fixed inset-0 z-[150] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm text-black overflow-hidden">
+            <div class="bg-blue-600 p-4 border-b border-blue-500 flex justify-between items-center text-white">
+                <h3 class="font-bold"><i class="fa-solid fa-pen-to-square mr-2"></i>Edit Stock</h3>
+                <button onclick="closeEditStockModal()" class="hover:text-gray-200"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div><label class="block text-xs font-bold text-gray-500 mb-1">Model Name</label><input type="text"
+                        id="editStockModel" class="input-light"></div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-1" id="lblEditPort1">Port 1</label><input
+                        type="text" id="editStockPort" class="input-light"></div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-1" id="lblEditPort2">Port 2</label><input
+                        type="text" id="editStockPort2" class="input-light"></div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-1" id="lblEditLane">Lane /
+                        Yard</label><input type="text" id="editStockLane" class="input-light"></div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-1">Plan Qty</label><input type="number"
+                        id="editStockPlan" class="input-light"></div>
+                <input type="hidden" id="editStockVId">
+                <input type="hidden" id="editStockSId">
+            </div>
+            <div class="bg-gray-100 p-3 flex justify-end gap-2 border-t">
+                <button onclick="closeEditStockModal()"
+                    class="px-4 py-2 bg-gray-300 rounded text-gray-700 font-bold hover:bg-gray-400 text-sm">Cancel</button>
+                <button onclick="saveStockEdit()"
+                    class="px-4 py-2 bg-blue-600 rounded text-white font-bold hover:bg-blue-700 text-sm">Save
+                    Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gangDetailModal"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div
+            class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-white" id="gangDetailTitle">Gang Details</h3>
+                    <div id="gangStatusModalBadge" class="text-xs mt-1 px-2 py-0.5 rounded inline-block">Status</div>
+                </div>
+                <button id="btnGangToggle"
+                    class="px-4 py-2 rounded font-bold text-sm shadow-lg ml-auto mr-4 transition transform hover:scale-105">Action</button>
+                <button onclick="closeGangModal()" class="text-slate-400 hover:text-white"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="gangDetailBody" class="p-0 overflow-y-auto flex-grow"></div>
+            <div class="bg-slate-900 p-3 border-t border-slate-700 text-center"><button onclick="closeGangModal()"
+                    class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm font-bold w-full">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="statDetailModal"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div
+            class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white" id="statDetailTitle">Stat Details</h3>
+                <button onclick="closeStatModal()" class="text-slate-400 hover:text-white"><i
+                        class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="statDetailBody" class="p-4 overflow-y-auto"></div>
+            <div class="bg-slate-900 p-3 border-t border-slate-700 text-center">
+                <button onclick="closeStatModal()"
+                    class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm font-bold w-full">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="periodReportModal"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div
+            class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] text-slate-800">
+            <div class="bg-purple-600 p-4 border-b border-purple-500 flex justify-between items-center text-white">
+                <h3 class="text-lg font-bold">Period Summary Report</h3>
+                <div class="flex items-center">
+                    <button onclick="exportReportToExcel()"
+                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow flex items-center gap-2 transition mr-2 text-xs font-bold border border-green-500">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="closePeriodReport()" class="text-purple-200 hover:text-white"><i
+                            class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+            </div>
+            <div id="periodReportBody" class="p-4 overflow-y-auto bg-slate-50"></div>
+            <div class="bg-gray-100 p-3 border-t border-gray-200 text-center flex justify-end"><button
+                    onclick="closePeriodReport()"
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-bold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmPeriodModal"
+        class="hidden fixed inset-0 z-[150] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div
+            class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-6">
+            <div class="mb-4 text-yellow-400 text-5xl"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 class="text-xl font-bold text-white mb-2">Confirm Action?</h3>
+            <p id="confirmPeriodText" class="text-slate-400 mb-6 text-sm"></p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeConfirmModal()"
+                    class="bg-slate-700 hover:bg-slate-600 text-white py-2 rounded font-bold">Cancel</button>
+                <button id="btnConfirmAction"
+                    class="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertModal"
+        class="hidden fixed inset-0 z-[200] flex items-center justify-center modal-backdrop fade-in p-4">
+        <div
+            class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-6">
+            <div class="mb-4 text-red-500 text-5xl"><i class="fa-solid fa-hand"></i></div>
+            <h3 class="text-xl font-bold text-white mb-2">Alert</h3>
+            <p id="alertModalText" class="text-slate-300 mb-6 text-sm"></p>
+            <button onclick="closeAlertModal()"
+                class="bg-slate-600 hover:bg-slate-500 text-white w-full py-2 rounded font-bold">OK</button>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-T8p6JaOw-1tdPxxLuxORuvQNAsZ9dUE",
+            authDomain: "roro-a87cb.firebaseapp.com",
+            databaseURL: "https://roro-a87cb-default-rtdb.firebaseio.com/",
+            projectId: "roro-a87cb",
+            storageBucket: "roro-a87cb.appspot.com",
+            messagingSenderId: "38927482392",
+            appId: "1:38927482392:web:123abc456def"
+        };
+
+        window.appData = { vessels: [], gangs: ["Gang 1", "Gang 2", "Gang 3", "Gang 4"], disabledGangs: [], breaks: [], portColors: { "JAPAN": "#22c55e", "IND": "#f97316", "USA": "#3b82f6" }, adminAuth: { user: "admin", pass: "999999999" } };
+        window.currentView = 'overview';
+        window.activeVesselId = null;
+        window.user = null;
+        window.currentOpMode = 'load';
+        window.isAdminLoggedIn = false;
+
+        let app, auth, db;
+        let _isSaving = false; // flag to prevent onValue from overwriting local data during save
+        let _dataDirty = true; // flag to avoid re-rendering when nothing changed
+
+        window.escapeStr = function (str) { if (!str) return ''; return str.toString().replace(/'/g, "\\'"); }
+
+        window.openEditStock = function (vId, sId) {
+            const v = window.appData.vessels.find(x => x.id === vId); if (!v) return;
+            const s = (v.stocks || []).find(x => x.id === sId); if (!s) return;
+            document.getElementById('editStockVId').value = vId;
+            document.getElementById('editStockSId').value = sId;
+            document.getElementById('editStockModel').value = s.model;
+            document.getElementById('editStockPort').value = s.port || '';
+            document.getElementById('editStockPort2').value = s.port2 || '';
+            document.getElementById('editStockLane').value = s.lane || '';
+            document.getElementById('editStockPlan').value = s.plan;
+
+            // Adjust Labels
+            const isLoad = s.type === 'load';
+            document.getElementById('lblEditPort1').innerText = isLoad ? 'Port of Discharge' : 'Port Load (Origin)';
+            document.getElementById('lblEditPort2').innerText = isLoad ? 'Final Port Discharge' : 'Port Discharge (Dest)';
+            document.getElementById('lblEditLane').innerText = isLoad ? 'Block' : 'Deck';
+
+            document.getElementById('editStockModal').classList.remove('hidden');
+        }
+        window.closeEditStockModal = function () { document.getElementById('editStockModal').classList.add('hidden'); }
+        window.saveStockEdit = function () {
+            // FIX: Use Number() instead of parseInt() to preserve decimals in IDs from Excel import
+            const vId = Number(document.getElementById('editStockVId').value);
+            const sId = Number(document.getElementById('editStockSId').value);
+
+            const v = window.appData.vessels.find(x => x.id === vId);
+            if (!v) return;
+
+            const s = (v.stocks || []).find(x => x.id === sId);
+            if (!s) {
+                console.error("Stock not found for update", sId);
+                return;
+            }
+
+            const newModel = document.getElementById('editStockModel').value;
+            const newPort = document.getElementById('editStockPort').value.trim();
+            const newPort2 = document.getElementById('editStockPort2').value.trim();
+            const newLane = document.getElementById('editStockLane').value;
+            const newPlan = parseInt(document.getElementById('editStockPlan').value); // Keep Qty as Int
+
+            if (!newModel || isNaN(newPlan)) { // Allow 0 if really needed, but check isNaN
+                window.showAlert("Model and Plan Qty are required!"); return;
+            }
+
+            s.model = newModel;
+            s.port = newPort;
+            s.port2 = newPort2;
+            s.lane = newLane;
+            s.plan = newPlan;
+
+            window.saveData();
+            window.renderAdminStockTable();
+            window.closeEditStockModal();
+        }
+
+        // --- EXCEL UPLOAD LOGIC START ---
+        window.handleExcelUpload = function () {
+            const fileInput = document.getElementById('excelUpload');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            if (!window.activeVesselId) {
+                window.showAlert("Please select a vessel first!");
+                fileInput.value = ''; // reset
+                return;
+            }
+
+            // Confirm overwrite if stocks exist
+            const vessel = window.appData.vessels.find(x => x.id === window.activeVesselId);
+            if (vessel.stocks && vessel.stocks.length > 0) {
+                if (!confirm("⚠️ Warning: Uploading a new file will REPLACE all existing stock data for this vessel.\n\nDo you want to continue?")) {
+                    fileInput.value = '';
+                    return;
+                }
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                // Clear existing stocks to ensure only latest file data is used
+                vessel.stocks = [];
+                let addedCount = 0;
+
+                // Process LOAD Sheet
+                if (workbook.Sheets['LOAD']) {
+                    const sheet = workbook.Sheets['LOAD'];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+                    json.forEach(row => {
+                        const model = row['Model'];
+                        const qty = row['Unit'];
+                        if (!model || !qty) return;
+
+                        const port = row['Port of Discharge'] || '';
+                        const finalPort = row['Final port discharge'] || '';
+                        const lane = row['Block'] || '';
+
+                        vessel.stocks.push({
+                            id: Date.now() + Math.random(),
+                            type: 'load',
+                            model: model.toString(),
+                            port: port.toString(),
+                            port2: finalPort.toString(), // Final Port
+                            lane: lane.toString(),
+                            plan: parseInt(qty) || 0,
+                            loadedMap: {}
+                        });
+                        addedCount++;
+                    });
+                }
+
+                // Process DISCHARGE Sheet
+                if (workbook.Sheets['DISCHARGE']) {
+                    const sheet = workbook.Sheets['DISCHARGE'];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+                    json.forEach(row => {
+                        const model = row['Model'];
+                        const qty = row['Unit'];
+                        if (!model || !qty) return;
+
+                        const portLoad = row['Port load'] || ''; // Origin
+                        const portDisch = row['Port Discharge'] || ''; // Destination
+                        const lane = row['Deck'] || '';
+
+                        vessel.stocks.push({
+                            id: Date.now() + Math.random(),
+                            type: 'discharge',
+                            model: model.toString(),
+                            port: portLoad.toString(),
+                            port2: portDisch.toString(),
+                            lane: lane.toString(),
+                            plan: parseInt(qty) || 0,
+                            loadedMap: {}
+                        });
+                        addedCount++;
+                    });
+                }
+
+                window.saveData();
+                window.renderAdminStockTable();
+                window.showAlert(`Import Successful! Replaced with ${addedCount} items from new file.`);
+                fileInput.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        // --- EXCEL UPLOAD LOGIC END ---
+
+        // ... existing code ... (Export, Stats, etc.)
+
+        window.exportReportToExcel = function () {
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId);
+            if (!v) return;
+
+            const wb = XLSX.utils.book_new();
+
+            // --- DATA PREPARATION ---
+            const logs = v.logs || [];
+            // Clone logs to sort without affecting original array
+            const sortedLogs = [...logs].sort((a, b) => a.timestamp - b.timestamp);
+
+            let totalLoad = 0;
+            let totalDisch = 0;
+            const gangStats = {};
+            const modelStats = {}; // Port -> Model -> Qty
+
+            sortedLogs.forEach(l => {
+                const qty = l.qty;
+                if (l.type === 'discharge') totalDisch += qty;
+                else totalLoad += qty;
+
+                if (!gangStats[l.gang]) gangStats[l.gang] = 0;
+                gangStats[l.gang] += qty;
+
+                const p = l.port ? l.port.trim().toUpperCase() : "UNKNOWN";
+                const m = l.model ? l.model.trim().toUpperCase() : "UNKNOWN";
+                if (!modelStats[p]) modelStats[p] = {};
+                if (!modelStats[p][m]) modelStats[p][m] = 0;
+                modelStats[p][m] += qty;
+            });
+
+            // 1. OVERVIEW SHEET
+            const overviewData = [];
+            const overviewStyleMap = {}; // Map: rowIdx -> styleObject
+            let rIdx = 0;
+
+            // Helper to add styled row
+            const addRow = (data, style = null) => {
+                overviewData.push(data);
+                if (style) overviewStyleMap[rIdx] = style;
+                rIdx++;
+            };
+
+            // Styles
+            const titleStyle = { font: { bold: true, sz: 14 }, fill: { fgColor: { rgb: "CCCCCC" } } };
+            const sectionStyle = { font: { bold: true }, fill: { fgColor: { rgb: "FFFFCC" } } }; // Light Yellow
+            const headerStyle = { font: { bold: true }, fill: { fgColor: { rgb: "E0E0E0" } } }; // Light Gray
+            const subHeaderStyle = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4B5563" } } }; // Dark Gray
+
+            // CHANGE: Updated Title
+            addRow(["2PS VESSEL OPERATION REPORT"], titleStyle);
+            addRow(["Vessel Name", v.name]);
+            addRow(["Voyage", v.voy]);
+            addRow(["Export Date", new Date().toLocaleString('th-TH')]);
+            addRow([]);
+
+            addRow(["SUMMARY TOTALS"], sectionStyle);
+            addRow(["Operation", "Quantity"], headerStyle);
+            addRow(["Loading", totalLoad]);
+            addRow(["Discharge", totalDisch]);
+            addRow(["TOTAL", totalLoad + totalDisch]);
+            addRow([]);
+
+            addRow(["PRODUCTIVITY (Start to Finish)"], sectionStyle);
+            if (sortedLogs.length > 0) {
+                const start = sortedLogs[0].timestamp;
+                const end = sortedLogs[sortedLogs.length - 1].timestamp;
+                const durationHrs = (end - start) / (1000 * 60 * 60);
+                const totalQty = totalLoad + totalDisch;
+                const rate = durationHrs > 0 ? (totalQty / durationHrs).toFixed(2) : 0;
+
+                addRow(["First Record", new Date(start).toLocaleString('th-TH')]);
+                addRow(["Last Record", new Date(end).toLocaleString('th-TH')]);
+                addRow(["Duration (Hrs)", durationHrs.toFixed(2)]);
+                addRow(["Avg Product/Hour", rate]);
+            } else {
+                addRow(["No Data available"]);
+            }
+
+            addRow([]);
+            addRow(["GANG PERFORMANCE SUMMARY"], sectionStyle);
+            addRow(["Gang Name", "Total Units"], headerStyle);
+            Object.keys(gangStats).sort().forEach(g => {
+                addRow([g, gangStats[g]]);
+            });
+
+            addRow([]);
+            addRow(["PORT / MODEL SUMMARY"], sectionStyle);
+            addRow(["Port", "Model", "Quantity"], headerStyle);
+            Object.keys(modelStats).sort().forEach(p => {
+                Object.keys(modelStats[p]).sort().forEach(m => {
+                    addRow([p, m, modelStats[p][m]]);
+                });
+            });
+
+            const wsOverview = XLSX.utils.aoa_to_sheet(overviewData);
+
+            // Apply Styles to Overview
+            Object.keys(overviewStyleMap).forEach(rowStr => {
+                const r = parseInt(rowStr);
+                const style = overviewStyleMap[r];
+                // Apply to first few columns (e.g., A-E) just to look nice
+                const range = XLSX.utils.decode_range(wsOverview['!ref']);
+                for (let c = range.s.c; c <= range.e.c; c++) {
+                    const cellRef = XLSX.utils.encode_cell({ r: r, c: c });
+                    if (!wsOverview[cellRef]) wsOverview[cellRef] = { t: 's', v: '' }; // Create empty cell if needed for background
+                    wsOverview[cellRef].s = style;
+                }
+            });
+
+            // CHANGE: Auto-width adjustment (Increased widths)
+            const wscols = [{ wch: 35 }, { wch: 25 }, { wch: 15 }];
+            wsOverview['!cols'] = wscols;
+
+            // CHANGE: Sheet Tab Color (Green)
+            if (!wsOverview['!properties']) wsOverview['!properties'] = {};
+            wsOverview['!properties'].tabColor = { rgb: "00FF00" };
+
+            XLSX.utils.book_append_sheet(wb, wsOverview, "Summary");
+
+            // 2. DETAILED LOGS SHEET
+            const logSheetData = [["Date", "Time", "Type", "Gang", "Port", "Model", "Block/Lane", "Qty"]];
+            sortedLogs.forEach(l => {
+                const d = new Date(l.timestamp);
+                logSheetData.push([
+                    d.toLocaleDateString('th-TH'),
+                    d.toLocaleTimeString('th-TH'),
+                    (l.type || 'load').toUpperCase(),
+                    l.gang,
+                    l.port,
+                    l.model,
+                    l.lane,
+                    l.qty
+                ]);
+            });
+            const wsLogs = XLSX.utils.aoa_to_sheet(logSheetData);
+
+            // Style Header Row (Row 0)
+            const rangeLogs = XLSX.utils.decode_range(wsLogs['!ref']);
+            for (let c = rangeLogs.s.c; c <= rangeLogs.e.c; c++) {
+                const cellRef = XLSX.utils.encode_cell({ r: 0, c: c });
+                if (wsLogs[cellRef]) {
+                    wsLogs[cellRef].s = {
+                        font: { bold: true },
+                        fill: { fgColor: { rgb: "D1FAE5" } },
+                        border: { bottom: { style: "thin", color: { rgb: "000000" } } }
+                    };
+                }
+            }
+
+            // CHANGE: Column Widths for Logs
+            wsLogs['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 10 }];
+
+            // CHANGE: Sheet Tab Color (Red)
+            if (!wsLogs['!properties']) wsLogs['!properties'] = {};
+            wsLogs['!properties'].tabColor = { rgb: "FF0000" };
+
+            XLSX.utils.book_append_sheet(wb, wsLogs, "Detailed Logs");
+
+            // Save File
+            const fileName = `${v.name}_${v.voy}_Report.xlsx`.replace(/[\/\\?%*:|"<>]/g, '-');
+            XLSX.writeFile(wb, fileName);
+        }
+
+        window.getGangData = function (v, gangName) {
+            if (!v.gangPeriods || !v.gangPeriods[gangName]) return { status: 'working', periods: v.periods || [] };
+            const gp = v.gangPeriods[gangName]; const lastP = gp[gp.length - 1];
+            const status = lastP && !lastP.end ? 'working' : 'break';
+            return { status, periods: gp };
+        }
+
+        window.showPortGangDetails = function (portName) {
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (!v) return;
+            const mode = window.currentOpMode; const gangStats = {}; let totalLoaded = 0; let totalPlan = 0;
+            (v.stocks || []).forEach(s => {
+                // Determine port to check based on mode
+                let sGroupPort = s.port;
+                if (mode === 'discharge') sGroupPort = s.port2; // Check Port Discharge for grouping in Discharge Mode
+
+                const sPortStr = sGroupPort ? sGroupPort.trim().toUpperCase() : "UNKNOWN";
+                const targetPort = portName ? portName.trim().toUpperCase() : "UNKNOWN";
+
+                if (sPortStr === targetPort && (s.type === mode || (!s.type && mode === 'load'))) {
+                    totalPlan += s.plan;
+                    if (s.loadedMap) {
+                        for (const [gang, qty] of Object.entries(s.loadedMap)) {
+                            if (qty > 0) {
+                                if (!gangStats[gang]) gangStats[gang] = { total: 0, models: {} };
+                                gangStats[gang].total += qty;
+                                if (!gangStats[gang].models[s.model]) gangStats[gang].models[s.model] = 0;
+                                gangStats[gang].models[s.model] += qty; totalLoaded += qty;
+                            }
+                        }
+                    }
+                }
+            });
+            const remaining = totalPlan - totalLoaded;
+            const modalBody = document.getElementById('statDetailBody'); const modalTitle = document.getElementById('statDetailTitle'); const pColor = getPortColor(portName);
+            modalTitle.innerHTML = `<span style="color: ${pColor}">Port: ${portName} (Gang & Model)</span>`;
+            let html = `<table class="w-full text-sm text-left text-slate-300"><thead class="text-xs uppercase bg-slate-700/50 text-slate-400"><tr><th class="p-3">Gang</th><th class="p-3">Model Breakdown</th><th class="p-3 text-right">Total</th></tr></thead><tbody class="divide-y divide-slate-700">`;
+            const gangs = Object.keys(gangStats).sort();
+            if (gangs.length === 0) html += `<tr><td colspan="3" class="p-4 text-center text-slate-500 italic">No activity</td></tr>`;
+            else {
+                gangs.forEach(g => {
+                    const gColor = getGangColor(g); const data = gangStats[g];
+                    const modelItems = Object.entries(data.models).sort((a, b) => b[1] - a[1]).map(([m, q]) => `<div class="flex justify-between items-center bg-slate-700/50 px-2 py-0.5 rounded mb-1 last:mb-0"><span class="text-white text-xs">${m}</span><span class="text-green-400 text-xs font-mono">${q}</span></div>`).join('');
+                    html += `<tr><td class="p-3 font-bold align-top" style="color: ${gColor}">${g}</td><td class="p-3 align-top">${modelItems}</td><td class="p-3 text-right font-bold text-white align-top text-lg">${data.total}</td></tr>`;
+                });
+            }
+            html += `<tr class="bg-slate-800/50 border-t-2 border-slate-600"><td colspan="2" class="p-2 text-right text-slate-400 uppercase text-xs">Total Plan</td><td class="p-2 text-right text-white font-bold">${totalPlan}</td></tr>`;
+            html += `<tr class="bg-slate-800/50"><td colspan="2" class="p-2 text-right text-slate-400 uppercase text-xs">Total Loaded</td><td class="p-2 text-right text-green-400 font-bold">${totalLoaded}</td></tr>`;
+            html += `<tr class="bg-slate-900 border-t border-slate-700"><td colspan="2" class="p-3 text-right text-slate-400 uppercase text-xs font-bold">Remaining</td><td class="p-3 text-right text-xl text-orange-400 font-bold">${remaining}</td></tr>`;
+            html += `</tbody></table>`;
+            modalBody.innerHTML = html; document.getElementById('statDetailModal').classList.remove('hidden');
+        }
+
+        window.showStatDetails = function (type) {
+            // ... (keep logic from previous) ...
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (!v) return;
+            let portData = {}; let titleText = ""; let colorClass = "text-white"; const mode = window.currentOpMode;
+            (v.stocks || []).forEach(s => {
+                if (s.type === mode || (!s.type && mode === 'load')) {
+                    let val = 0; let loaded = Object.values(s.loadedMap || {}).reduce((a, b) => a + b, 0);
+                    if (type === 'plan') val = s.plan;
+                    else if (type === 'loaded') val = loaded;
+                    else if (type === 'remaining') val = s.plan - loaded;
+                    if (val > 0) {
+                        let port = 'UNKNOWN';
+                        if (mode === 'discharge') {
+                            port = s.port2 ? s.port2.trim().toUpperCase() : (s.port ? s.port.trim().toUpperCase() : 'UNKNOWN');
+                        } else {
+                            port = s.port ? s.port.trim().toUpperCase() : 'UNKNOWN';
+                        }
+
+                        if (!portData[port]) portData[port] = { total: 0, items: [] };
+                        let existingItem = portData[port].items.find(i => i.model === s.model);
+                        if (existingItem) existingItem.qty += val; else portData[port].items.push({ model: s.model, qty: val });
+                        portData[port].total += val;
+                    }
+                }
+            });
+            if (type === 'plan') { titleText = "Total Plan Breakdown"; colorClass = "text-blue-400"; }
+            else if (type === 'loaded') { titleText = (mode === 'load' ? "Loaded" : "Discharged") + " Breakdown"; colorClass = mode === 'load' ? "text-green-400" : "text-pink-400"; }
+            else if (type === 'remaining') { titleText = "Remaining Breakdown"; colorClass = "text-orange-400"; }
+            const modalBody = document.getElementById('statDetailBody'); const modalTitle = document.getElementById('statDetailTitle');
+            modalTitle.innerHTML = `<span class="${colorClass}">${titleText}</span>`;
+
+            const groupHeaderText = mode === 'discharge' ? 'Port Disch / Model' : 'Port Disch / Model';
+
+            let html = `<div class="overflow-y-auto max-h-[60vh]"><table class="w-full text-sm text-left text-slate-300"><thead class="text-xs uppercase bg-slate-700/50 text-slate-400 sticky top-0"><tr><th class="p-3 text-left">${groupHeaderText}</th><th class="p-3 text-right">Qty</th></tr></thead><tbody class="divide-y divide-slate-700">`;
+            const ports = Object.keys(portData).sort(); let grandTotal = 0;
+            if (ports.length === 0) html += `<tr><td colspan="2" class="p-4 text-center text-slate-500 italic">No items found</td></tr>`;
+            else {
+                ports.forEach(port => {
+                    const data = portData[port]; const pColor = getPortColor(port); grandTotal += data.total;
+                    html += `<tr class="bg-slate-800/50" style="border-left: 4px solid ${pColor}"><td class="p-2 pl-3 font-bold flex items-center gap-2" style="color: ${pColor}"><span class="w-3 h-3 rounded-full border border-white/10" style="background-color:${pColor}"></span>${port}</td><td class="p-2 pr-3 text-right font-bold text-white bg-slate-700/30 text-lg">${data.total}</td></tr>`;
+                    data.items.sort((a, b) => b.qty - a.qty).forEach(item => {
+                        html += `<tr class="hover:bg-slate-700/20"><td class="p-2 pl-8 text-xs text-slate-300 border-l-2" style="border-color: ${pColor}50">${item.model}</td><td class="p-2 pr-3 text-right font-mono text-xs ${colorClass}">${item.qty}</td></tr>`;
+                    });
+                });
+                html += `<tr class="bg-slate-900 border-t-2 border-slate-600"><td class="p-3 text-right font-bold text-slate-400 uppercase">Grand Total</td><td class="p-3 text-right text-xl text-white font-bold">${grandTotal}</td></tr>`;
+            }
+            html += `</tbody></table></div>`; modalBody.innerHTML = html; document.getElementById('statDetailModal').classList.remove('hidden');
+        }
+
+        window.closeStatModal = function () { document.getElementById('statDetailModal').classList.add('hidden'); }
+
+        window.showPeriodReport = function () {
+            // ... (same as provided in context) ...
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId);
+            if (!v) return;
+
+            const modalBody = document.getElementById('periodReportBody');
+            modalBody.innerHTML = '';
+
+            // Base Date Calculation
+            let baseDate = new Date();
+            if (v.logs && v.logs.length > 0) {
+                const earliest = v.logs.reduce((min, cur) => cur.timestamp < min ? cur.timestamp : min, v.logs[0].timestamp);
+                baseDate = new Date(earliest);
+            } else if (v.startTime) {
+                const [h, m] = v.startTime.split(':');
+                baseDate.setHours(h, m, 0, 0);
+            }
+
+            const reportTree = {};
+            const periodMeta = {};
+
+            const gangs = window.appData.gangs.filter(g => !(v.disabledGangs || []).includes(g));
+
+            gangs.forEach(gangName => {
+                let periods = (v.gangPeriods && v.gangPeriods[gangName]) ? v.gangPeriods[gangName] : [];
+                if (periods.length === 0 && v.logs && v.logs.some(l => l.gang === gangName)) {
+                    periods = [{ name: "P1", start: v.startTime, end: null }];
+                }
+
+                let currentDay = new Date(baseDate);
+                currentDay.setHours(0, 0, 0, 0);
+                let lastEndMs = 0;
+
+                periods.forEach((p, idx) => {
+                    const [sH, sM] = p.start.split(':').map(Number);
+                    let startDt = new Date(currentDay);
+                    startDt.setHours(sH, sM, 0, 0);
+                    if (idx > 0 && startDt.getTime() < lastEndMs) {
+                        startDt.setDate(startDt.getDate() + 1);
+                        currentDay.setDate(currentDay.getDate() + 1);
+                    }
+                    let endDt = null;
+                    if (p.end) {
+                        const [eH, eM] = p.end.split(':').map(Number);
+                        endDt = new Date(startDt);
+                        endDt.setHours(eH, eM, 59, 999);
+                        if (endDt < startDt) endDt.setDate(endDt.getDate() + 1);
+                    } else {
+                        endDt = new Date(); // Present
+                    }
+                    lastEndMs = endDt.getTime();
+
+                    const formatDt = (d) => `${d.getDate()}/${d.getMonth() + 1} ${d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+                    const timeStr = `${formatDt(startDt)} - ${p.end ? formatDt(endDt) : 'Now'}`;
+
+                    if (!reportTree[p.name]) reportTree[p.name] = {};
+                    if (!periodMeta[p.name]) periodMeta[p.name] = {};
+
+                    periodMeta[p.name][gangName] = timeStr;
+
+                    const gangLogs = (v.logs || []).filter(l =>
+                        l.gang === gangName &&
+                        l.timestamp >= startDt.getTime() &&
+                        l.timestamp <= endDt.getTime()
+                    );
+
+                    if (gangLogs.length > 0) {
+                        if (!reportTree[p.name][gangName]) reportTree[p.name][gangName] = { discharge: {}, load: {} };
+
+                        gangLogs.forEach(l => {
+                            const typeKey = (l.type === 'discharge') ? 'discharge' : 'load';
+                            const port = l.port ? l.port.trim().toUpperCase() : "UNKNOWN";
+                            const model = l.model || "UNKNOWN";
+
+                            if (!reportTree[p.name][gangName][typeKey][port]) reportTree[p.name][gangName][typeKey][port] = {};
+                            if (!reportTree[p.name][gangName][typeKey][port][model]) reportTree[p.name][gangName][typeKey][port][model] = 0;
+
+                            reportTree[p.name][gangName][typeKey][port][model] += l.qty;
+                        });
+                    }
+                });
+            });
+
+            let html = '<div class="space-y-8">';
+            let grandTotal = 0;
+
+            const sortedPNames = Object.keys(reportTree).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            if (sortedPNames.length === 0) {
+                html += '<div class="text-center text-slate-500 py-10">No period data available.</div>';
+            }
+
+            sortedPNames.forEach(pName => {
+                const gangDataMap = reportTree[pName];
+                const gangNames = Object.keys(gangDataMap).sort();
+
+                html += `
+                <div class="border border-slate-300 rounded-xl overflow-hidden shadow-sm bg-slate-50">
+                    <div class="bg-indigo-600 text-white p-3 font-bold text-lg shadow-md flex items-center">
+                        <span class="bg-indigo-800 px-3 py-1 rounded-lg mr-2 border border-indigo-400">Period: ${pName}</span>
+                    </div>
+                    <div class="p-4 space-y-4">
+                `;
+
+                gangNames.forEach(gName => {
+                    const gColor = getGangColor(gName);
+                    const timeRange = periodMeta[pName][gName] || "Unknown Time";
+                    const ops = gangDataMap[gName];
+
+                    html += `
+                    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="bg-slate-100 px-3 py-2 border-b border-slate-200 flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm" style="color:${gColor}"><i class="fa-solid fa-people-group mr-1"></i>${gName}</span>
+                            </div>
+                            <span class="text-xs font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                <i class="fa-regular fa-clock mr-1"></i>${timeRange}
+                            </span>
+                        </div>
+                        <div class="p-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                    `;
+
+                    const renderOpBlock = (type, dataObj, colorClass, title, icon) => {
+                        const ports = Object.keys(dataObj).sort();
+                        let blockTotal = 0;
+                        let content = '';
+
+                        ports.forEach(port => {
+                            const models = dataObj[port];
+                            const pColor = getPortColor(port);
+                            let portQty = 0;
+                            let modelList = '';
+
+                            Object.entries(models).forEach(([m, q]) => {
+                                modelList += `<div class="flex justify-between text-[11px] text-slate-600 border-b border-dashed border-slate-100 last:border-0 pb-0.5 mb-0.5"><span>${m}</span><span class="font-bold">${q}</span></div>`;
+                                portQty += q;
+                            });
+                            blockTotal += portQty;
+
+                            content += `
+                            <div class="border border-slate-100 rounded p-2 mb-2 bg-slate-50/50">
+                                <div class="flex justify-between items-center mb-1 border-b border-slate-200 pb-1">
+                                    <div class="font-bold text-[11px]" style="color:${pColor}"><i class="fa-solid fa-anchor mr-1 text-[9px]"></i>${port}</div>
+                                    <div class="text-[10px] font-bold bg-white border px-1.5 rounded">${portQty}</div>
+                                </div>
+                                <div>${modelList}</div>
+                            </div>`;
+                        });
+
+                        grandTotal += blockTotal;
+
+                        if (blockTotal === 0) return '';
+
+                        return `
+                        <div class="border rounded-lg overflow-hidden border-${colorClass}-200">
+                            <div class="bg-${colorClass}-50 px-2 py-1 text-${colorClass}-700 font-bold text-xs border-b border-${colorClass}-100 flex justify-between">
+                                <span><i class="fa-solid ${icon} mr-1"></i>${title}</span>
+                                <span>${blockTotal}</span>
+                            </div>
+                            <div class="p-2 bg-white h-full">${content}</div>
+                        </div>
+                        `;
+                    };
+
+                    const dischargeHtml = renderOpBlock('discharge', ops.discharge, 'pink', 'Discharge', 'fa-download');
+                    const loadHtml = renderOpBlock('load', ops.load, 'green', 'Loading', 'fa-upload');
+
+                    if (!dischargeHtml && !loadHtml) {
+                        html += `<div class="col-span-2 text-center text-xs text-slate-400 italic py-2">No activity in this period</div>`;
+                    } else {
+                        html += dischargeHtml;
+                        html += loadHtml;
+                    }
+
+                    html += `</div></div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            html += `
+            <div class="bg-slate-900 text-white p-4 rounded-lg flex justify-between items-center shadow-lg sticky bottom-0 z-10 border-t-4 border-blue-500">
+                <span class="font-bold text-sm uppercase text-slate-300">Total Units in Report</span>
+                <span class="font-bold text-2xl font-mono text-green-400">${grandTotal}</span>
+            </div></div>`;
+
+            modalBody.innerHTML = html;
+            document.getElementById('periodReportModal').classList.remove('hidden');
+        };
+
+        window.showGangDetail = function (gangName) {
+            // ... existing ...
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (!v) return;
+            let gp = (v.gangPeriods && v.gangPeriods[gangName]) ? v.gangPeriods[gangName] : (v.periods || []);
+            let lastP = gp[gp.length - 1]; let isWorking = lastP && !lastP.end;
+            const modalTitle = document.getElementById('gangDetailTitle'); const badge = document.getElementById('gangStatusModalBadge'); const btn = document.getElementById('btnGangToggle'); const gColor = getGangColor(gangName);
+            modalTitle.innerText = `${gangName} Performance`; modalTitle.style.color = gColor;
+            if (isWorking) { badge.className = "text-xs mt-1 px-2 py-0.5 rounded inline-block bg-green-500/20 text-green-400 border border-green-500/50"; badge.innerText = "🟢 Working"; btn.className = "bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded font-bold text-sm shadow-lg ml-auto mr-4 transition transform hover:scale-105"; btn.innerHTML = `<i class="fa-solid fa-pause mr-2"></i>Break`; btn.onclick = () => window.promptGangAction(gangName, 'break'); }
+            else { badge.className = "text-xs mt-1 px-2 py-0.5 rounded inline-block bg-red-500/20 text-red-400 border border-red-500/50"; badge.innerText = "🔴 On Break"; btn.className = "bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold text-sm shadow-lg ml-auto mr-4 transition transform hover:scale-105"; btn.innerHTML = `<i class="fa-solid fa-play mr-2"></i>Start`; btn.onclick = () => window.promptGangAction(gangName, 'start'); }
+
+            let dischargeData = {};
+            let loadData = {};
+            let totalDischarge = 0;
+            let totalLoad = 0;
+
+            (v.stocks || []).forEach(s => {
+                if (s.loadedMap && s.loadedMap[gangName] > 0) {
+                    const qty = s.loadedMap[gangName];
+                    const isDischarge = s.type === 'discharge';
+
+                    let port = 'UNKNOWN';
+                    let targetData = null;
+
+                    if (isDischarge) {
+                        port = s.port2 ? s.port2.trim().toUpperCase() : (s.port ? s.port.trim().toUpperCase() : 'UNKNOWN');
+                        targetData = dischargeData;
+                        totalDischarge += qty;
+                    } else {
+                        port = s.port ? s.port.trim().toUpperCase() : 'UNKNOWN';
+                        targetData = loadData;
+                        totalLoad += qty;
+                    }
+
+                    if (!targetData[port]) targetData[port] = { total: 0, items: [] };
+
+                    let existing = targetData[port].items.find(i => i.model === s.model);
+                    if (existing) {
+                        existing.qty += qty;
+                    } else {
+                        targetData[port].items.push({ model: s.model, qty: qty });
+                    }
+                    targetData[port].total += qty;
+                }
+            });
+
+            const modalBody = document.getElementById('gangDetailBody');
+            if (modalBody) {
+                modalBody.innerHTML = '';
+                let html = `<div class="overflow-y-auto max-h-[60vh] text-sm text-slate-300">`;
+
+                const renderSection = (title, icon, colorClass, borderClass, dataObj, totalVal) => {
+                    if (totalVal === 0) return '';
+                    let sectionHtml = `
+                        <div class="sticky top-0 bg-slate-900 z-10 p-2 border-b ${borderClass} mb-0 shadow-md">
+                            <div class="flex justify-between items-center font-bold ${colorClass}">
+                                <span><i class="fa-solid ${icon} mr-2"></i>${title}</span>
+                                <span class="bg-slate-800 px-2 py-0.5 rounded text-white border border-slate-700">${totalVal}</span>
+                            </div>
+                        </div>
+                        <table class="w-full text-left mb-4 border-b border-slate-700/50">
+                            <thead class="text-[10px] uppercase bg-slate-800 text-slate-500">
+                                <tr><th class="p-2 pl-4">Port / Model</th><th class="p-2 text-right">Qty</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/50">
+                    `;
+
+                    const ports = Object.keys(dataObj).sort();
+                    ports.forEach(port => {
+                        const pData = dataObj[port];
+                        const pColor = getPortColor(port);
+                        sectionHtml += `<tr class="bg-slate-800/30"><td class="p-1.5 pl-3 font-bold flex items-center gap-2 text-xs" style="color: ${pColor}"><span class="w-2 h-2 rounded-full" style="background-color:${pColor}"></span>${port}</td><td class="p-1.5 pr-2 text-right font-bold text-white text-xs">${pData.total}</td></tr>`;
+
+                        pData.items.sort((a, b) => b.qty - a.qty).forEach(item => {
+                            sectionHtml += `<tr class="hover:bg-slate-700/20"><td class="p-1.5 pl-8 text-[11px] text-slate-400 border-l border-dashed border-slate-700">${item.model}</td><td class="p-1.5 pr-2 text-right font-mono text-[11px] ${colorClass}">${item.qty}</td></tr>`;
+                        });
+                    });
+                    sectionHtml += `</tbody></table>`;
+                    return sectionHtml;
+                };
+
+                const hasData = totalDischarge > 0 || totalLoad > 0;
+
+                if (!hasData) {
+                    html += `<div class="p-10 text-center text-slate-500 flex flex-col items-center"><i class="fa-solid fa-clipboard-question text-4xl mb-3 opacity-50"></i><p>No items loaded yet by this gang.</p></div>`;
+                } else {
+                    html += renderSection("DISCHARGE (Import)", "fa-download", "text-pink-400", "border-pink-500/30", dischargeData, totalDischarge);
+                    html += renderSection("LOADING (Export)", "fa-upload", "text-green-400", "border-green-500/30", loadData, totalLoad);
+                    html += `<div class="bg-slate-900 border-t-2 border-slate-600 p-4 flex justify-between items-center sticky bottom-0 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]"><span class="font-bold text-slate-400 uppercase text-sm">Grand Total (All)</span><span class="text-2xl text-white font-bold">${totalDischarge + totalLoad}</span></div>`;
+                }
+
+                html += `</div>`;
+                modalBody.innerHTML = html;
+            }
+            document.getElementById('gangDetailModal').classList.remove('hidden');
+        };
+
+        window.promptGangAction = function (gangName, action) {
+            document.getElementById('gangDetailModal').classList.add('hidden'); document.getElementById('confirmPeriodModal').classList.remove('hidden');
+            const t = document.getElementById('confirmPeriodText'); const b = document.getElementById('btnConfirmAction');
+            if (action === 'break') { t.innerHTML = `Confirm Break for <span class="font-bold text-white">${gangName}</span>?`; b.className = "bg-orange-600 hover:bg-orange-500 text-white py-2 rounded font-bold"; b.innerText = "Confirm Break"; b.onclick = () => { window.executeGangAction(gangName, 'break'); window.closeConfirmModal(); }; }
+            else { t.innerHTML = `Confirm Start Work for <span class="font-bold text-white">${gangName}</span>?`; b.className = "bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold"; b.innerText = "Confirm Start"; b.onclick = () => { window.executeGangAction(gangName, 'start'); window.closeConfirmModal(); }; }
+        }
+
+        window.executeGangAction = function (gangName, action) {
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (!v) return;
+            if (!v.gangPeriods) v.gangPeriods = {}; if (!v.gangPeriods[gangName]) v.gangPeriods[gangName] = JSON.parse(JSON.stringify(v.periods || []));
+            const gp = v.gangPeriods[gangName]; const nowTime = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+            if (action === 'break') { if (gp.length > 0) gp[gp.length - 1].end = nowTime; } else { const nextId = gp.length + 1; gp.push({ id: Date.now(), name: "P" + nextId, start: nowTime, end: null }); }
+            window.saveData();
+        }
+
+        window.renderVesselDetail = function () {
+            if (document.activeElement.tagName === 'INPUT') { window.updateLiveTime(); return; }
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (!v) return window.goToOverview();
+            document.getElementById('detailVesselName').innerText = v.name; document.getElementById('detailVesselVoy').innerText = v.voy;
+
+            let displayTime = v.startTime;
+            let timeBadge = '<span class="text-slate-500 text-[10px] ml-1">(Plan)</span>';
+            let timeColor = "text-slate-300";
+
+            if (v.logs && v.logs.length > 0) {
+                const firstLog = v.logs.reduce((min, cur) => cur.timestamp < min.timestamp ? cur : min, v.logs[0]);
+                const d = new Date(firstLog.timestamp);
+                displayTime = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                timeBadge = '<span class="text-green-500 text-[10px] ml-1 font-bold animate-pulse">(Actual)</span>';
+                timeColor = "text-green-400 font-bold text-lg";
+            }
+
+            const startTimeEl = document.getElementById('detailStartTime');
+            startTimeEl.innerHTML = `<span class="${timeColor}">${displayTime}</span>${timeBadge}`;
+
+            const s = calculateVesselStats(v, window.currentOpMode);
+            document.getElementById('detailTotal').innerText = s.plan;
+            document.getElementById('detailLoaded').innerText = s.loaded;
+            document.getElementById('detailRemaining').innerText = s.remaining;
+
+            const prodEl = document.getElementById('detailShipProduct');
+            if (prodEl) prodEl.innerText = s.shipProduct || 0;
+            const etcEl = document.getElementById('detailETC');
+            if (etcEl) etcEl.innerText = s.etc;
+
+            const isLoad = window.currentOpMode === 'load';
+            document.getElementById('tabLoad').className = isLoad ? "flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4 bg-green-500 text-white border-green-700 shadow-lg shadow-green-500/40 transform scale-105" : "flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4 bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 opacity-70 hover:opacity-100";
+            document.getElementById('tabDischarge').className = !isLoad ? "flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4 bg-red-600 text-white border-red-800 shadow-lg shadow-red-600/40 transform scale-105" : "flex-1 py-3 rounded-lg font-bold text-sm uppercase transition border-b-4 bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 opacity-70 hover:opacity-100";
+
+            document.getElementById('colPortHeader1').innerText = isLoad ? 'Port Disch' : 'Port Load';
+            document.getElementById('colPortHeader2').innerText = isLoad ? 'Final Port' : 'Port Disch';
+            document.getElementById('colLaneHeader').innerText = isLoad ? 'Block' : 'Deck';
+
+            document.getElementById('lblLoaded').innerText = isLoad ? "Loaded" : "Discharged";
+            const statCard = document.getElementById('statLoadedCard'); statCard.className = isLoad ? "glass-panel p-3 rounded-xl text-center border-t-4 border-green-500 cursor-pointer hover:bg-slate-700/50 transition active:scale-95" : "glass-panel p-3 rounded-xl text-center border-t-4 border-red-500 cursor-pointer hover:bg-slate-700/50 transition active:scale-95";
+            document.getElementById('detailLoaded').className = isLoad ? "text-2xl font-bold text-green-400" : "text-2xl font-bold text-red-500";
+            const pct = s.plan > 0 ? Math.round((s.loaded / s.plan) * 100) : 0; const visualPct = Math.max(0, Math.min(100, pct)); const barGradient = isLoad ? "from-green-600 to-green-400" : "from-red-600 to-red-400"; const shipBadgeColor = isLoad ? "bg-green-600 border-green-400" : "bg-red-600 border-red-400";
+            document.getElementById('detailShipProgress').innerHTML = `<div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 p-5 relative"><div class="relative w-full h-2 bg-slate-700 rounded-full"><div class="absolute top-0 left-0 h-full bg-gradient-to-r ${barGradient} rounded-full transition-all duration-1000" style="width: ${visualPct}%"></div><div class="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 z-10 flex flex-col items-center" style="left: ${visualPct}%; transform: translate(-50%, -50%);"><div class="${shipBadgeColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg mb-1 whitespace-nowrap border">${pct}%</div><i class="fa-solid fa-ferry text-2xl text-white drop-shadow-md" style="text-shadow: 0 4px 6px rgba(0,0,0,0.5);"></i></div></div></div>`;
+            window.updateLiveTime();
+            const sel = document.getElementById('currentGangSelect'); const statusDisp = document.getElementById('gangStatusDisplay');
+
+            // --- UPDATED: Use vessel-specific disabledGangs ---
+            const vesselDisabledGangs = v.disabledGangs || [];
+            const activeGangs = window.appData.gangs.filter(g => !vesselDisabledGangs.includes(g));
+            // -------------------------------------------------
+
+            const currentVal = sel.value; sel.innerHTML = '<option value="" disabled selected>-- Select Gang --</option>';
+            activeGangs.forEach(g => { const o = document.createElement('option'); o.value = g; o.innerText = g; o.style.color = getGangColor(g); o.style.fontWeight = "bold"; o.style.backgroundColor = "#1e293b"; sel.appendChild(o); });
+            if (currentVal && activeGangs.includes(currentVal)) sel.value = currentVal; else sel.value = "";
+            if (sel.value) { const gColor = getGangColor(sel.value); sel.style.color = gColor; sel.style.borderColor = gColor; sel.style.boxShadow = `0 0 10px ${gColor}40`; const gd = window.getGangData(v, sel.value); statusDisp.classList.remove('hidden'); if (gd.status === 'break') { statusDisp.innerHTML = `<i class="fa-solid fa-mug-hot mr-1"></i> ${sel.value} is on <b>BREAK</b>`; statusDisp.className = "mt-2 text-center text-xs text-red-300 bg-red-900/30 border border-red-800 p-2 rounded animate-pulse"; } else { statusDisp.innerHTML = `<i class="fa-solid fa-bolt mr-1"></i> ${sel.value} is <b>WORKING</b>`; statusDisp.className = "mt-2 text-center text-xs text-green-300 bg-green-900/30 border border-green-800 p-2 rounded"; } } else { sel.style.color = "white"; sel.style.borderColor = "rgb(59 130 246)"; sel.style.boxShadow = "none"; statusDisp.classList.add('hidden'); }
+            const tb = document.getElementById('detailTableBody'); let _tbHtml = ''; const curG = sel ? sel.value : ""; const portStats = {};
+            let displayStocks = (v.stocks || []).filter(st => { const itemType = st.type || 'load'; return itemType === window.currentOpMode; });
+
+            // --- SORTING LOGIC (pre-compute loaded/remaining to avoid recalc in comparator) ---
+            const _stockLoaded = new Map();
+            displayStocks.forEach(st => {
+                _stockLoaded.set(st.id, Object.values(st.loadedMap || {}).reduce((x, y) => x + y, 0));
+            });
+            displayStocks.sort((a, b) => {
+                const isDoneA = (a.plan - _stockLoaded.get(a.id)) === 0;
+                const isDoneB = (b.plan - _stockLoaded.get(b.id)) === 0;
+
+                if (isDoneA && !isDoneB) return 1;
+                if (!isDoneA && isDoneB) return -1;
+
+                const portA = (a.port || "ZZZZ").toUpperCase();
+                const portB = (b.port || "ZZZZ").toUpperCase();
+                if (portA < portB) return -1;
+                if (portA > portB) return 1;
+
+                const port2A = (a.port2 || "ZZZZ").toUpperCase();
+                const port2B = (b.port2 || "ZZZZ").toUpperCase();
+                if (port2A < port2B) return -1;
+                if (port2A > port2B) return 1;
+
+                const modelA = (a.model || "").toUpperCase();
+                const modelB = (b.model || "").toUpperCase();
+                if (modelA < modelB) return -1;
+                if (modelA > modelB) return 1;
+
+                if ((a.lane || "") < (b.lane || "")) return -1;
+                if ((a.lane || "") > (b.lane || "")) return 1;
+                return 0;
+            });
+
+            displayStocks.forEach(st => {
+                const l = _stockLoaded.get(st.id); const rem = st.plan - l;
+                let groupPort = st.port;
+                if (window.currentOpMode === 'discharge') groupPort = st.port2;
+
+                const pName = groupPort ? groupPort.trim().toUpperCase() : "UNKNOWN";
+                if (!portStats[pName]) portStats[pName] = { plan: 0, loaded: 0 };
+                portStats[pName].plan += st.plan;
+                portStats[pName].loaded += l;
+
+                const pColor = getPortColor(groupPort);
+                const portColorStyle = `color: ${pColor}`;
+
+                const btnColor = isLoad ? 'bg-green-600 hover:bg-green-500 shadow-green-500/30' : 'bg-red-600 hover:bg-red-500 shadow-red-500/30';
+
+                let rowClass = "";
+                let textClass = "text-white";
+                let modelColor = "text-white";
+
+                if (rem === 0) {
+                    rowClass = "bg-gray-900/50 grayscale opacity-50";
+                    textClass = "text-gray-500";
+                    modelColor = "text-gray-500";
+                } else {
+                    rowClass = "";
+                    textClass = "text-white";
+                }
+
+                _tbHtml += `<tr class="${rowClass} transition-all duration-500" style="border-left: 4px solid ${pColor}"><td class="p-3 text-xs font-bold uppercase min-w-[100px]" style="${rem === 0 ? 'color:gray' : portColorStyle}">${st.port || '-'}</td><td class="p-3 text-xs font-bold text-gray-400 min-w-[100px]">${st.port2 || '-'}</td><td class="p-3 font-bold ${modelColor} min-w-[70px]">${st.model}</td><td class="p-3 text-blue-300 font-mono text-xs min-w-[70px]">${st.lane}</td><td class="p-3 text-center bg-slate-800/30 border-x border-slate-700 min-w-[140px]">${rem > 0 || l > 0 ? `<div class="flex gap-1 justify-center items-center"><button onclick="submitLoad(${v.id},${st.id}, -1)" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-l text-sm shadow-lg transform active:scale-95 transition"><i class="fa-solid fa-minus"></i></button><input type="number" id="inp_load_${st.id}" class="w-16 bg-slate-700 text-white text-center border-y border-slate-500 py-1.5 text-base font-bold shadow-inner" placeholder="#" onkeypress="if(event.key==='Enter') submitLoad(${v.id}, ${st.id})"><button onclick="submitLoad(${v.id},${st.id}, 1)" class="${btnColor} text-white px-3 py-1.5 rounded-r text-sm shadow-lg transform active:scale-95 transition"><i class="fa-solid fa-plus"></i></button></div>` : '<span class="text-green-500 text-xs font-bold"><i class="fa-solid fa-check mr-1"></i>DONE</span>'}</td><td class="p-3 text-center ${textClass}">${st.plan}</td><td class="p-3 text-center font-bold text-green-400 bg-green-900/20 border-x border-slate-700 text-lg">${l}</td><td class="p-3 text-center ${rem === 0 ? 'text-green-500 font-bold' : 'text-orange-400 font-bold'}">${rem}</td></tr>`;
+            });
+            if (tb) tb.innerHTML = _tbHtml;
+            const gg = document.getElementById('detailGangGrid'); if (gg) {
+                const gangMetrics = {};
+                activeGangs.forEach(g => {
+                    gangMetrics[g] = calculateGangStats(v, g);
+                });
+
+                let currentShipRate = s.shipProduct || 0;
+
+                const perfHeader = gg.parentElement.querySelector('.flex.justify-between');
+                if (perfHeader) {
+                    let rateDisplay = document.getElementById('shipRateDisplay');
+                    if (!rateDisplay) {
+                        rateDisplay = document.createElement('div');
+                        rateDisplay.id = 'shipRateDisplay';
+                        rateDisplay.className = "text-right bg-slate-800/50 px-3 py-1 rounded border border-slate-600 ml-auto mr-2";
+                        perfHeader.insertBefore(rateDisplay, perfHeader.lastElementChild);
+                    }
+                    rateDisplay.innerHTML = `<div class="text-[10px] text-slate-400 uppercase font-bold text-center">SHIP PRODUCT</div><div class="text-lg font-bold text-yellow-400 leading-none text-center">${currentShipRate} <span class="text-[10px] text-slate-500">U/Hr</span></div>`;
+                }
+
+                let _ggHtml = '';
+                activeGangs.forEach(g => {
+                    const gColor = getGangColor(g);
+                    const isSelected = g === curG;
+                    const metrics = gangMetrics[g];
+                    const gd = window.getGangData(v, g);
+                    const isBreak = gd.status === 'break';
+                    const statusDot = isBreak ? `<span class="absolute top-1 right-1 w-3 h-3 rounded-full bg-red-500 shadow-sm border border-white/20"></span>` : `<span class="absolute top-1 right-1 w-3 h-3 rounded-full bg-green-500 shadow-sm border border-white/20 pulse-active"></span>`;
+                    const style = isSelected ? `background-color: ${gColor}; border-color: ${gColor}; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);` : `border-color: ${gColor}; color: ${gColor}; background-color: rgba(0,0,0,0.2);`;
+
+                    _ggHtml += `<div onclick="window.showGangDetail('${window.escapeStr(g)}')" class="relative p-2 rounded text-center border-2 cursor-pointer transition transform hover:scale-105 active:scale-95 shadow-md flex flex-col justify-between min-h-[90px] ${isBreak ? 'opacity-70 grayscale-[0.5]' : ''}" style="${style}">${statusDot}<div class="text-[10px] uppercase truncate font-bold opacity-90 pr-2 border-b border-white/10 pb-1 mb-1">${g}</div><div class="flex-grow flex flex-col justify-center"><div class="text-2xl font-bold leading-none">${metrics.totalQty}</div><div class="text-[10px] font-mono mt-1 opacity-90 bg-black/20 rounded px-1"><i class="fa-solid fa-gauge-high mr-1"></i>${metrics.rate}/hr</div></div></div>`;
+                });
+                gg.innerHTML = _ggHtml;
+            }
+            const portDiv = document.getElementById('detailPortSummary');
+            if (portDiv) {
+                document.getElementById('lblPortSummary').innerText = isLoad ? "Destination Port Summary" : "Port Discharge Summary";
+                let pHtml = ''; const sortedPorts = Object.keys(portStats).sort();
+                if (sortedPorts.length === 0) pHtml = '<div class="col-span-full text-center text-slate-500 italic py-4">No data for this mode</div>';
+                else { sortedPorts.forEach(p => { const s = portStats[p]; const pct = s.plan > 0 ? Math.round((s.loaded / s.plan) * 100) : 0; const pColor = getPortColor(p); pHtml += `<div onclick="showPortGangDetails('${window.escapeStr(p)}')" class="bg-slate-700/50 p-3 rounded border border-slate-600 shadow-sm cursor-pointer hover:bg-slate-600 transition active:scale-95 group" style="border-left: 4px solid ${pColor}"><div class="flex justify-between items-center mb-2"><div class="font-bold flex items-center gap-2 group-hover:opacity-80 transition" style="color: ${pColor}"><span class="w-2 h-2 rounded-full border border-white/10" style="background-color: ${pColor}"></span>${p}</div><div class="text-xs font-mono text-blue-200 bg-blue-900/50 px-2 py-0.5 rounded">${s.loaded} / ${s.plan}</div></div><div class="w-full bg-slate-800 rounded-full h-2 mb-1"><div class="h-2 rounded-full transition-all duration-500" style="background-color: ${pColor}; width: ${pct}%"></div></div><div class="text-right text-[10px] text-slate-400">${pct}% Done</div></div>`; }); }
+                portDiv.innerHTML = pHtml;
+            }
+            const hl = document.getElementById('detailHistoryBody'); if (hl) {
+                let _hlHtml = ''; (v.logs || []).filter(l => (l.type || 'load') === window.currentOpMode).slice(0, 20).forEach(log => {
+                    const t = new Date(log.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }); const gColor = getGangColor(log.gang);
+                    let p = log.port; if (!p) { const stk = (v.stocks || []).find(s => s.id === log.stockId); p = stk ? stk.port : '-'; }
+                    const pColor = getPortColor(p); const qtyColor = log.qty < 0 ? 'text-red-400' : 'text-green-400';
+                    _hlHtml += `<tr class="hover:bg-slate-800/50 transition"><td class="p-3 text-xs text-gray-400 font-mono">${t}</td><td class="p-3 text-xs font-bold" style="color: ${gColor}">${log.gang}</td><td class="p-3 text-xs text-white">${log.model}</td><td class="p-3 text-xs font-bold" style="color:${pColor}">${p || '-'}</td><td class="p-3 text-xs text-gray-400 font-mono">${log.lane}</td><td class="p-3 text-right ${qtyColor} font-bold">${log.qty > 0 ? '+' : ''}${log.qty}</td></tr>`;
+                });
+                hl.innerHTML = _hlHtml;
+            }
+        };
+
+        function getGangColor(name) { if (!name) return "#94a3b8"; const palette = ["#ef4444", "#22c55e", "#3b82f6", "#f97316", "#a855f7", "#ec4899", "#eab308", "#06b6d4"]; if (window.appData && window.appData.gangs) { const index = window.appData.gangs.indexOf(name); if (index !== -1) return palette[index % palette.length]; } let hash = 0; for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash); return `hsl(${Math.abs(hash) % 360}, 70%, 60%)`; }
+
+        async function initSystem() {
+            try {
+                app = initializeApp(firebaseConfig); auth = getAuth(app); db = getDatabase(app); await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => {
+                    window.user = user; if (user) {
+                        onValue(ref(db, 'roro_v1/master'), (snapshot) => {
+                            document.getElementById('app-loader').classList.add('hidden'); updateStatus(true);
+                            const data = snapshot.val();
+                            if (data) {
+                                if (_isSaving) {
+                                    // While saving, don't overwrite local data — just skip
+                                    return;
+                                }
+                                window.appData = data; validateData();
+                                _dataDirty = true;
+                                autoCleanupOldData();
+                            } else { window.saveData(); }
+                            if (document.activeElement.tagName !== 'INPUT') window.render(); else window.updateLiveTime();
+                        }, (err) => { console.error("RTDB Error", err); showConnectionError("Network Error"); });
+                    }
+                });
+            } catch (e) { console.error("Init Failed:", e); showConnectionError("Config Error"); }
+        }
+
+        window.initSystem = initSystem;
+        initSystem();
+
+        function updateStatus(isOnline) {
+            const el = document.getElementById('connectionStatus'); if (el) {
+                el.innerText = isOnline ? "🟢 Online (RTDB)" : "🔴 Disconnected";
+                el.className = isOnline ? "text-green-400 font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-green-900" : "text-red-500 font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded";
+            }
+        }
+
+        function showConnectionError(msg) { document.getElementById('loader-spinner').classList.add('hidden'); document.getElementById('loader-error').classList.remove('hidden'); if (msg !== "Configuration Missing or Invalid") document.getElementById('loader-error-msg').innerText = msg; }
+
+        function validateData() {
+            if (!window.appData.vessels) window.appData.vessels = [];
+            if (!window.appData.gangs) window.appData.gangs = ["Gang 1", "Gang 2", "Gang 3", "Gang 4"];
+            if (!window.appData.disabledGangs) window.appData.disabledGangs = []; // Global fallback (not used in new logic)
+            if (!window.appData.breaks) window.appData.breaks = [];
+            if (!window.appData.portColors) window.appData.portColors = { "JAPAN": "#22c55e", "IND": "#f97316", "USA": "#3b82f6" };
+            if (!window.appData.adminAuth) window.appData.adminAuth = { user: "admin", pass: "999999999" };
+        }
+
+        // Auto-cleanup: delete vessels older than 3 months
+        let _hasRunCleanup = false;
+        function autoCleanupOldData() {
+            if (_hasRunCleanup) return; // run only once per session
+            _hasRunCleanup = true;
+            if (!window.appData.vessels || window.appData.vessels.length === 0) return;
+
+            const THREE_MONTHS_MS = 90 * 24 * 60 * 60 * 1000; // ~3 months
+            const cutoff = Date.now() - THREE_MONTHS_MS;
+
+            const before = window.appData.vessels.length;
+            const removed = window.appData.vessels.filter(v => v.id < cutoff);
+            window.appData.vessels = window.appData.vessels.filter(v => v.id >= cutoff);
+            const after = window.appData.vessels.length;
+
+            if (before > after) {
+                console.log(`[Auto-Cleanup] Removed ${before - after} vessel(s) older than 3 months:`,
+                    removed.map(v => `${v.name} (${new Date(v.id).toLocaleDateString('th-TH')})`));
+                if (window.activeVesselId && !window.appData.vessels.find(v => v.id === window.activeVesselId)) {
+                    window.activeVesselId = null;
+                    window.currentView = 'overview';
+                }
+                window.saveData();
+            }
+        }
+
+        window.saveData = async function () {
+            if (window.user && db) {
+                _isSaving = true;
+                try {
+                    await set(ref(db, 'roro_v1/master'), window.appData);
+                } catch (e) {
+                    console.error("Save Error", e);
+                    window.showAlert("Save Failed: " + e.message);
+                } finally {
+                    _isSaving = false;
+                    _dataDirty = true;
+                    // Re-render since onValue was skipped during save
+                    window.render();
+                }
+            } else {
+                window.showAlert("Offline! Data not saved.");
+            }
+        };
+
+        window.goToOverview = function () { window.currentView = 'overview'; window.activeVesselId = null; window.render(); }
+
+        window.goToDetail = function (vId) {
+            window.currentView = 'detail';
+            window.activeVesselId = vId;
+
+            const v = window.appData.vessels.find(x => x.id === vId);
+            if (v) {
+                const sDischarge = calculateVesselStats(v, 'discharge');
+                const sLoad = calculateVesselStats(v, 'load');
+
+                const hasDischargePlan = sDischarge.plan > 0;
+                const hasLoadPlan = sLoad.plan > 0;
+
+                const isDischargeActive = sDischarge.remaining > 0;
+                const isLoadActive = sLoad.remaining > 0;
+
+                if (hasDischargePlan && isDischargeActive) {
+                    window.currentOpMode = 'discharge';
+                } else if (hasLoadPlan && isLoadActive) {
+                    window.currentOpMode = 'load';
+                } else {
+                    if (hasDischargePlan) {
+                        window.currentOpMode = 'discharge';
+                    } else if (hasLoadPlan) {
+                        window.currentOpMode = 'load';
+                    } else {
+                        window.currentOpMode = 'discharge';
+                    }
+                }
+            } else {
+                window.currentOpMode = 'discharge';
+            }
+
+            window.render();
+        }
+
+        window.goToAdmin = function () {
+            if (window.isAdminLoggedIn) {
+                window.currentView = 'admin';
+                window.render();
+            } else {
+                document.getElementById('adminLoginModal').classList.remove('hidden');
+                document.getElementById('adminLoginPass').value = '';
+                document.getElementById('loginErrorMsg').classList.add('hidden');
+            }
+        }
+
+        window.closeAdminLogin = function () {
+            document.getElementById('adminLoginModal').classList.add('hidden');
+        }
+
+        window.attemptAdminLogin = function () {
+            const u = document.getElementById('adminLoginUser').value;
+            const p = document.getElementById('adminLoginPass').value;
+            const auth = window.appData.adminAuth;
+
+            if (u === auth.user && p === auth.pass) {
+                window.isAdminLoggedIn = true;
+                document.getElementById('adminLoginModal').classList.add('hidden');
+                window.goToAdmin();
+            } else {
+                document.getElementById('loginErrorMsg').classList.remove('hidden');
+            }
+        }
+
+        window.logoutAdmin = function () {
+            window.isAdminLoggedIn = false;
+            window.goToOverview();
+        }
+
+        window.saveAdminConfig = function () {
+            const u = document.getElementById('changeAdminUser').value;
+            const p = document.getElementById('changeAdminPass').value;
+
+            if (u && p) {
+                if (confirm("Are you sure you want to update admin credentials?")) {
+                    window.appData.adminAuth.user = u;
+                    window.appData.adminAuth.pass = p;
+                    window.saveData();
+                    alert("Credentials updated successfully.");
+                    document.getElementById('changeAdminUser').value = '';
+                    document.getElementById('changeAdminPass').value = '';
+                }
+            } else {
+                alert("Please enter both username and password.");
+            }
+        }
+
+        window.switchOpMode = function (mode) { window.currentOpMode = mode; window.renderVesselDetail(); }
+
+        window.updateAdminStockForm = function () {
+            const radios = document.getElementsByName('stockType');
+            let type = 'load';
+            for (let i = 0; i < radios.length; i++) { if (radios[i].checked) type = radios[i].value; }
+            const isLoad = type === 'load';
+            document.getElementById('addPort').placeholder = isLoad ? "Port of Discharge" : "Port Load (Origin)";
+            document.getElementById('addPort2').placeholder = isLoad ? "Final port discharge" : "Port Discharge";
+            document.getElementById('addLane').placeholder = isLoad ? "Block" : "Deck";
+        }
+
+        window.render = function () {
+            if (document.activeElement.tagName === 'INPUT') return;
+            document.getElementById('view-overview').classList.add('hidden'); document.getElementById('view-detail').classList.add('hidden'); document.getElementById('view-admin').classList.add('hidden');
+            const btnDash = document.getElementById('btn-dash'); const btnAdmin = document.getElementById('btn-admin');
+            btnDash.className = "px-4 py-2 rounded text-sm font-bold transition " + (window.currentView !== 'admin' ? "bg-blue-600 text-white shadow-lg" : "bg-slate-700 text-slate-300 hover:text-white");
+            btnAdmin.className = "px-4 py-2 rounded text-sm font-bold transition " + (window.currentView === 'admin' ? "bg-blue-600 text-white shadow-lg" : "bg-slate-700 text-slate-300 hover:text-white");
+            if (window.currentView === 'overview') { document.getElementById('view-overview').classList.remove('hidden'); renderOverview(); }
+            else if (window.currentView === 'detail') { document.getElementById('view-detail').classList.remove('hidden'); window.renderVesselDetail(); }
+            else if (window.currentView === 'admin') { document.getElementById('view-admin').classList.remove('hidden'); window.renderAdmin(); window.updateAdminStockForm(); }
+        }
+
+        window.updateLiveTime = function () {
+            const now = new Date(); const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); const dateStr = now.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const clockTimeEl = document.getElementById('clockTime'); const clockDateEl = document.getElementById('clockDate');
+            if (clockTimeEl) clockTimeEl.innerText = timeStr; if (clockDateEl) clockDateEl.innerText = dateStr;
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId); if (v) {
+                const s = calculateVesselStats(v, window.currentOpMode);
+                const etcEl = document.getElementById('detailETC'); if (etcEl) etcEl.innerText = s.etc;
+                const prodEl = document.getElementById('detailShipProduct'); if (prodEl) prodEl.innerText = s.shipProduct || 0;
+            }
+        }
+
+        window.hardReset = function () { if (confirm("⚠ DANGER: This will delete ALL data. Confirm?")) { window.appData = { vessels: [], gangs: ["Gang 1"], breaks: [] }; window.saveData(); location.reload(); } }
+        window.addNewVessel = function () {
+            const name = document.getElementById('newVesName').value; const voy = document.getElementById('newVesVoy').value; const time = document.getElementById('newVesTime').value;
+            if (!name || !voy) { window.showAlert("Please enter Name and Voyage"); return; }
+            window.appData.vessels.push({ id: Date.now(), name: name, voy: voy, startTime: time, stocks: [], logs: [], periods: [{ id: 1, name: "P1", start: time, end: null }], gangPeriods: {}, status: 'working' });
+            document.getElementById('newVesName').value = ''; document.getElementById('newVesVoy').value = ''; window.saveData();
+        }
+        window.deleteVessel = function (id) { if (confirm("Delete this vessel?")) { window.appData.vessels = window.appData.vessels.filter(v => v.id !== id); if (window.activeVesselId === id) window.activeVesselId = null; window.saveData(); } }
+        window.toggleVesselVisibility = function (id) {
+            const v = window.appData.vessels.find(x => x.id === id);
+            if (!v) return;
+            v.hiddenInOverview = !v.hiddenInOverview;
+            window.saveData();
+        }
+        window.addStockItem = function () {
+            if (!window.activeVesselId) { window.showAlert("Please select a vessel."); return; }
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId);
+            const m = document.getElementById('addModel').value;
+            const pt = document.getElementById('addPort').value.trim();
+            const pt2 = document.getElementById('addPort2').value.trim();
+            const l = document.getElementById('addLane').value;
+            const p = parseInt(document.getElementById('addPlan').value);
+            const radios = document.getElementsByName('stockType'); let type = 'load';
+            for (let i = 0; i < radios.length; i++) { if (radios[i].checked) type = radios[i].value; }
+            if (!m || !l || !p) { window.showAlert("Missing fields"); return; }
+            if (!v.stocks) v.stocks = [];
+            v.stocks.push({ id: Date.now(), type: type, model: m, port: pt, port2: pt2, lane: l, plan: p, loadedMap: {} });
+            document.getElementById('addModel').value = ''; document.getElementById('addLane').value = ''; document.getElementById('addPlan').value = ''; document.getElementById('addPort').value = ''; document.getElementById('addPort2').value = '';
+            window.saveData(); window.renderAdminStockTable();
+        }
+        window.deleteStock = function (vId, sId) { const v = window.appData.vessels.find(x => x.id === vId); if (v) { v.stocks = (v.stocks || []).filter(s => s.id !== sId); window.saveData(); window.renderAdminStockTable(); } }
+
+        window.submitLoad = async function (vId, sId, sign = 1) {
+            const gangName = document.getElementById('currentGangSelect').value; if (!gangName) { window.showAlert("❗ Select Gang First!"); return; }
+            const v = window.appData.vessels.find(x => x.id === vId);
+            const gStatus = (v.gangPeriods && v.gangPeriods[gangName]) ? v.gangPeriods[gangName][v.gangPeriods[gangName].length - 1] : (v.periods ? v.periods[v.periods.length - 1] : null);
+            if (gStatus && gStatus.end) { window.showAlert(`⛔ ${gangName} is on BREAK! Please Start Work first.`); return; }
+            const inp = document.getElementById(`inp_load_${sId}`); let qty = parseInt(inp.value); if (!qty) return; qty = Math.abs(qty) * sign;
+            inp.value = '';
+
+            if (!window.user || !db) { window.showAlert("Offline! Data not saved."); return; }
+
+            // Find vessel index and stock index for the Firebase path
+            const vesselIndex = window.appData.vessels.findIndex(x => x.id === vId);
+            if (vesselIndex === -1) return;
+            const stockIndex = (window.appData.vessels[vesselIndex].stocks || []).findIndex(x => x.id === sId);
+            if (stockIndex === -1) return;
+
+            const masterRef = ref(db, 'roro_v1/master');
+            _isSaving = true;
+            try {
+                const result = await runTransaction(masterRef, (currentData) => {
+                    if (!currentData) return currentData;
+
+                    const vessel = currentData.vessels[vesselIndex];
+                    if (!vessel) return; // abort transaction
+                    const stock = (vessel.stocks || [])[stockIndex];
+                    if (!stock) return; // abort
+
+                    if (!stock.loadedMap) stock.loadedMap = {};
+                    if (!stock.loadedMap[gangName]) stock.loadedMap[gangName] = 0;
+
+                    const loaded = Object.values(stock.loadedMap).reduce((a, b) => a + b, 0);
+
+                    // Validation inside transaction (using fresh server data)
+                    if (qty > 0 && (loaded + qty) > stock.plan) return; // abort
+                    if (qty < 0 && (loaded + qty) < 0) return; // abort
+                    if (qty < 0 && (stock.loadedMap[gangName] + qty) < 0) return; // abort
+
+                    stock.loadedMap[gangName] += qty;
+
+                    if (!vessel.logs) vessel.logs = [];
+                    vessel.logs.unshift({
+                        timestamp: Date.now(), stockId: sId, gang: gangName, qty: qty,
+                        model: stock.model, lane: stock.lane, port: stock.port, type: stock.type || 'load'
+                    });
+
+                    return currentData;
+                });
+
+                // Sync local data from the committed transaction result
+                if (result.committed && result.snapshot.val()) {
+                    window.appData = result.snapshot.val();
+                    validateData();
+                    _dataDirty = true;
+                    window.render();
+                }
+            } catch (e) {
+                console.error("Transaction Error", e);
+                window.showAlert("Save Failed: " + e.message);
+            } finally {
+                _isSaving = false;
+            }
+        }
+
+        window.addNewGang = function () { const n = document.getElementById('newGangName').value.trim(); if (n && !window.appData.gangs.includes(n)) { window.appData.gangs.push(n); document.getElementById('newGangName').value = ''; window.saveData(); window.renderAdminGangList(); } }
+        window.deleteGang = function (n) { if (confirm("Del?")) { window.appData.gangs = window.appData.gangs.filter(g => g !== n); window.saveData(); window.renderAdminGangList(); } }
+
+        window.toggleGang = function (name) {
+            // --- UPDATED: Toggle for specific vessel ---
+            if (!window.activeVesselId) {
+                window.showAlert("Please select a vessel first to manage gangs.");
+                return;
+            }
+            const v = window.appData.vessels.find(x => x.id === window.activeVesselId);
+            if (!v) return;
+
+            if (!v.disabledGangs) v.disabledGangs = [];
+
+            const idx = v.disabledGangs.indexOf(name);
+            if (idx === -1) {
+                v.disabledGangs.push(name); // Disable
+            } else {
+                v.disabledGangs.splice(idx, 1); // Enable
+            }
+            window.saveData();
+            window.renderAdminGangList();
+        }
+
+        window.renameGang = function (o) { const n = prompt("New:", o); if (n && n !== o) { const i = window.appData.gangs.indexOf(o); window.appData.gangs[i] = n; window.saveData(); window.renderAdminGangList(); } }
+        window.addBreak = function () { const n = document.getElementById('breakName').value; const s = document.getElementById('breakStart').value; const e = document.getElementById('breakEnd').value; if (!n || !s || !e) return; window.appData.breaks.push({ name: n, start: s, end: e }); window.saveData(); }
+        window.deleteBreak = function (i) { if (confirm("Del?")) { window.appData.breaks.splice(i, 1); window.saveData(); } }
+
+        window.savePortColor = function () {
+            const n = document.getElementById('portColorName').value.trim().toUpperCase();
+            const c = document.getElementById('portColorPicker').value;
+            if (n) {
+                if (!window.appData.portColors) window.appData.portColors = {};
+                window.appData.portColors[n] = c;
+                window.saveData();
+                document.getElementById('portColorName').value = '';
+                window.renderAdmin();
+            }
+        }
+        window.editPortColor = function (name, color) {
+            document.getElementById('portColorName').value = name;
+            document.getElementById('portColorPicker').value = color;
+        }
+        window.deletePortColor = function (n) { if (confirm("Del color?")) { delete window.appData.portColors[n]; window.saveData(); window.renderAdmin(); } }
+
+        function getPortColor(p) {
+            if (!p) return "#64748b";
+            const pu = p.toString().trim().toUpperCase();
+            return (window.appData.portColors && window.appData.portColors[pu]) ? window.appData.portColors[pu] : "#64748b";
+        }
+
+        window.closeConfirmModal = function () { document.getElementById('confirmPeriodModal').classList.add('hidden'); }
+        window.showAlert = function (m) { document.getElementById('alertModalText').innerText = m; document.getElementById('alertModal').classList.remove('hidden'); }
+        window.closeAlertModal = function () { document.getElementById('alertModal').classList.add('hidden'); }
+        window.closeGangModal = function () { document.getElementById('gangDetailModal').classList.add('hidden'); }
+        window.closePeriodReport = function () { document.getElementById('periodReportModal').classList.add('hidden'); }
+
+        window.renderAdmin = function () {
+            const l = document.getElementById('adminVesselList'); let _alHtml = ''; window.appData.vessels.forEach(v => {
+                const isHidden = !!v.hiddenInOverview;
+                const eyeIcon = isHidden ? 'fa-eye-slash' : 'fa-eye';
+                const eyeColor = isHidden ? 'text-gray-400' : 'text-blue-600';
+                const eyeTitle = isHidden ? 'Hidden in Overview (click to show)' : 'Visible in Overview (click to hide)';
+                _alHtml += `<li class="flex justify-between items-center bg-gray-100 p-2 rounded text-sm"><span class="font-bold text-blue-800 ${isHidden ? 'line-through opacity-60' : ''}">${v.name}</span><span class="flex items-center gap-3"><button onclick="toggleVesselVisibility(${v.id})" class="${eyeColor}" title="${eyeTitle}"><i class="fa-solid ${eyeIcon}"></i></button><button onclick="deleteVessel(${v.id})" class="text-red-500"><i class="fa-solid fa-trash-can"></i></button></span></li>`;
+            }); l.innerHTML = _alHtml;
+            const s = document.getElementById('adminVesselSelect'); let _asHtml = '<option value="">-- No Vessel --</option>'; window.appData.vessels.forEach(v => _asHtml += `<option value="${v.id}">${v.name}</option>`); s.innerHTML = _asHtml;
+            if (window.activeVesselId) s.value = window.activeVesselId;
+
+            // Render Gang List (Dependent on vessel selection)
+            window.renderAdminGangList();
+
+            const bl = document.getElementById('adminBreakList'); let _blHtml = ''; window.appData.breaks.forEach((b, i) => _blHtml += `<li class="flex justify-between bg-orange-50 p-2 rounded text-sm"><span>${b.name}: ${b.start}-${b.end}</span><button onclick="deleteBreak(${i})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></li>`); bl.innerHTML = _blHtml;
+            const pcl = document.getElementById('adminPortColorList'); let _pclHtml = '';
+            if (window.appData.portColors) {
+                Object.entries(window.appData.portColors).forEach(([p, c]) => {
+                    _pclHtml += `<li class="flex justify-between p-2 bg-gray-50 text-sm border-b last:border-0">
+                        <div class="flex gap-2 items-center"><span class="w-4 h-4 rounded-full border border-gray-300" style="background:${c}"></span><span class="font-bold">${p}</span></div>
+                        <div class="flex gap-3">
+                            <button onclick="editPortColor('${window.escapeStr(p)}', '${c}')" class="text-blue-500 hover:text-blue-700 transition"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deletePortColor('${window.escapeStr(p)}')" class="text-red-400 hover:text-red-600 transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </li>`;
+                });
+            }
+            pcl.innerHTML = _pclHtml;
+            window.renderAdminStockTable();
+        }
+
+        // --- NEW: Handle Vessel Change in Admin ---
+        window.handleAdminVesselChange = function () {
+            const vId = document.getElementById('adminVesselSelect').value;
+            window.activeVesselId = vId ? parseInt(vId) : null;
+            window.renderAdminStockTable();
+            window.renderAdminGangList();
+        }
+
+        // --- NEW: Render Gang List based on Vessel ---
+        window.renderAdminGangList = function () {
+            const gl = document.getElementById('adminGangList');
+            const vesselNameEl = document.getElementById('adminGangVesselName');
+            const helpText = document.getElementById('adminGangHelpText');
+            const newGangInput = document.getElementById('newGangName');
+
+            gl.innerHTML = '';
+
+            let currentVessel = null;
+            if (window.activeVesselId) {
+                currentVessel = window.appData.vessels.find(v => v.id === window.activeVesselId);
+            }
+
+            if (currentVessel) {
+                // Active Vessel Mode
+                vesselNameEl.innerText = `For: ${currentVessel.name}`;
+                vesselNameEl.classList.remove('hidden');
+                helpText.classList.add('hidden');
+                newGangInput.disabled = false;
+
+                // Ensure vessel has disabledGangs array
+                if (!currentVessel.disabledGangs) currentVessel.disabledGangs = [];
+
+                let _glHtml = '';
+                window.appData.gangs.forEach(g => {
+                    const isDisabled = currentVessel.disabledGangs.includes(g);
+                    const opacity = isDisabled ? 'opacity-50' : '';
+                    const icon = isDisabled ? 'fa-toggle-off' : 'fa-toggle-on';
+                    const iconColor = isDisabled ? 'text-gray-400' : 'text-green-500';
+                    const labelColor = isDisabled ? 'text-gray-400 line-through' : 'text-slate-800';
+
+                    _glHtml += `
+                    <li class="flex justify-between items-center bg-gray-50 p-2 rounded text-sm border border-slate-100 ${opacity}">
+                        <span onclick="renameGang('${window.escapeStr(g)}')" class="cursor-pointer font-bold ${labelColor}">${g}</span>
+                        <div class="flex gap-2 items-center">
+                            <button onclick="toggleGang('${window.escapeStr(g)}')" class="text-2xl ${iconColor} hover:scale-110 transition focus:outline-none">
+                                <i class="fa-solid ${icon}"></i>
+                            </button>
+                            <button onclick="deleteGang('${window.escapeStr(g)}')" class="text-red-400 ml-2 hover:text-red-600 focus:outline-none">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </li>`;
+                });
+                gl.innerHTML = _glHtml;
+            } else {
+                // No Vessel Selected
+                vesselNameEl.classList.add('hidden');
+                helpText.classList.remove('hidden');
+                gl.innerHTML = '<li class="text-center text-gray-400 italic p-4">Please select a vessel to manage gangs.</li>';
+            }
+        }
+
+        window.renderAdminStockTable = function () {
+            const b = document.getElementById('adminStockBody'); const vId = parseInt(document.getElementById('adminVesselSelect').value);
+            if (!vId) { b.innerHTML = ''; return; } window.activeVesselId = vId; const v = window.appData.vessels.find(x => x.id === vId);
+            const radios = document.getElementsByName('stockType'); let type = 'load';
+            for (let i = 0; i < radios.length; i++) { if (radios[i].checked) type = radios[i].value; }
+
+            let _bHtml = '';
+            if (v) {
+                (v.stocks || []).filter(s => s.type === type).forEach(s => {
+                    const typeBadge = s.type === 'discharge' ? '<span class="text-pink-600 font-bold">D</span>' : '<span class="text-blue-600 font-bold">L</span>';
+                    const pColor = getPortColor(s.port);
+                    _bHtml += `<tr><td class="p-3">${typeBadge}</td><td class="p-3 font-bold">${s.model}</td><td class="p-3 font-bold" style="color:${pColor}">${s.port || '-'}</td><td class="p-3 font-bold text-gray-500">${s.port2 || '-'}</td><td class="p-3 text-right">${s.plan}</td><td class="p-3 text-center flex gap-2 justify-center"><button onclick="openEditStock(${v.id},${s.id})" class="text-blue-500 hover:text-blue-700 bg-blue-100 p-1 rounded"><i class="fa-solid fa-pen"></i></button><button onclick="deleteStock(${v.id},${s.id})" class="text-red-500 hover:text-red-700 bg-red-100 p-1 rounded"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                });
+            }
+            b.innerHTML = _bHtml;
+        }
+
+        function parseTimeWithDayWrap(timeStr, refZeroDate, prevTimestamp) {
+            if (!timeStr) return prevTimestamp > 0 ? prevTimestamp : refZeroDate.getTime();
+            const [h, m] = timeStr.split(':').map(Number);
+            let d = new Date(refZeroDate);
+            d.setHours(h, m, 0, 0);
+            let ts = d.getTime();
+
+            if (prevTimestamp !== -1) {
+                while (ts < prevTimestamp) {
+                    ts += 24 * 60 * 60 * 1000;
+                }
+            }
+            return ts;
+        }
+
+        function calculateGangStats(v, gangName) {
+            let baseDate = new Date();
+            if (v.logs && v.logs.length > 0) {
+                const sortedLogs = [...v.logs].sort((a, b) => a.timestamp - b.timestamp);
+                baseDate = new Date(sortedLogs[0].timestamp);
+            } else if (v.startTime) {
+                const [h, m] = v.startTime.split(':').map(Number);
+                baseDate.setHours(h, m, 0, 0);
+            }
+            const refZeroDate = new Date(baseDate);
+            refZeroDate.setHours(0, 0, 0, 0);
+
+            const periods = window.getGangData(v, gangName).periods;
+            let netTimeMs = 0;
+            if (periods && periods.length > 0) {
+                let lastTs = -1;
+                periods.forEach(p => {
+                    let startMs = parseTimeWithDayWrap(p.start, refZeroDate, lastTs);
+                    lastTs = startMs;
+                    let endMs;
+                    if (p.end) {
+                        endMs = parseTimeWithDayWrap(p.end, refZeroDate, lastTs);
+                        lastTs = endMs;
+                    } else {
+                        endMs = Date.now();
+                        if (endMs < startMs) endMs = startMs;
+                    }
+                    netTimeMs += (endMs - startMs);
+                });
+            }
+
+            let totalQty = 0;
+            if (v.logs) {
+                v.logs.forEach(l => {
+                    if (l.gang === gangName) totalQty += l.qty;
+                });
+            }
+
+            let rate = 0;
+            if (netTimeMs >= 60000) {
+                const hours = netTimeMs / (1000 * 60 * 60);
+                rate = Math.round(totalQty / hours);
+            }
+
+            return { rate, netTimeMs, totalQty };
+        }
+
+        function calculateVesselStats(v, mode = null) {
+            let p = 0, l = 0;
+            (v.stocks || []).forEach(s => {
+                if (!mode || s.type === mode || (!s.type && mode === 'load')) {
+                    p += s.plan;
+                    l += (Object.values(s.loadedMap || {}).reduce((a, b) => a + b, 0));
+                }
+            });
+
+            let totalPlan = 0, totalLoaded = 0;
+            (v.stocks || []).forEach(s => {
+                totalPlan += s.plan;
+                totalLoaded += (Object.values(s.loadedMap || {}).reduce((a, b) => a + b, 0));
+            });
+
+            let etc = "--:--";
+            let shipProduct = 0;
+            let durationStr = "0h 0m";
+            const remainingGlobal = totalPlan - totalLoaded;
+
+            if (totalLoaded > 0 && v.logs && v.logs.length > 0) {
+                const firstLog = v.logs[v.logs.length - 1];
+                const startTime = firstLog.timestamp;
+                let endTime = Date.now();
+
+                if (totalPlan > 0 && remainingGlobal <= 0) {
+                    const lastLog = v.logs[0];
+                    endTime = lastLog.timestamp;
+                }
+
+                const durationMs = Math.max(0, endTime - startTime);
+                const hrs = Math.floor(durationMs / (1000 * 60 * 60));
+                const mins = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+                durationStr = `${hrs}h ${mins}m`;
+
+                if (durationMs > 60000) {
+                    const durationHrs = durationMs / (1000 * 60 * 60);
+                    shipProduct = Math.round(totalLoaded / durationHrs);
+                }
+            } else if (totalLoaded === 0) {
+                // Not started
+            }
+
+            if (totalLoaded > 0 && remainingGlobal > 0) {
+                if (shipProduct > 0) {
+                    const timeToFinishHours = remainingGlobal / shipProduct;
+                    const timeToFinishMs = timeToFinishHours * 60 * 60 * 1000;
+
+                    const etcDate = new Date(Date.now() + timeToFinishMs);
+                    const dStr = etcDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                    const tStr = etcDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                    etc = `${dStr} ${tStr}`;
+                } else {
+                    etc = "Calc...";
+                }
+            } else if (totalPlan > 0 && remainingGlobal <= 0) {
+                etc = "Done";
+            } else if (totalLoaded === 0) {
+                etc = "Waiting...";
+            }
+
+            return { plan: p, loaded: l, remaining: p - l, etc, shipProduct, durationStr };
+        }
+
+        window.onMonthFilterChange = function (forceToday) {
+            const inp = document.getElementById('monthFilterInput');
+            if (forceToday || !inp) {
+                const now = new Date();
+                const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                if (inp) inp.value = ym;
+                window.selectedFilterMonth = ym;
+            } else {
+                window.selectedFilterMonth = inp.value;
+            }
+            renderOverview();
+        };
+
+        function renderOverview() {
+            // Init month filter default
+            if (!window.selectedFilterMonth) {
+                const now = new Date();
+                window.selectedFilterMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            }
+            const inp = document.getElementById('monthFilterInput');
+            if (inp && inp.value !== window.selectedFilterMonth) inp.value = window.selectedFilterMonth;
+
+            const [filterYear, filterMonth] = window.selectedFilterMonth.split('-').map(Number);
+
+            // Filter vessels: vessel created in this month OR has logs in this month
+            // Also exclude vessels that admin has hidden from the overview
+            const allVessels = (window.appData.vessels || []).filter(v => !v.hiddenInOverview);
+            const filteredVessels = allVessels.filter(v => {
+                // Check vessel creation month (id is a timestamp)
+                const created = new Date(v.id);
+                if (created.getFullYear() === filterYear && (created.getMonth() + 1) === filterMonth) return true;
+                // Check if any logs fall in this month
+                if (v.logs && v.logs.length > 0) {
+                    return v.logs.some(l => {
+                        const d = new Date(l.timestamp);
+                        return d.getFullYear() === filterYear && (d.getMonth() + 1) === filterMonth;
+                    });
+                }
+                return false;
+            });
+
+            const g = document.getElementById('vesselGrid');
+            let _gridHtml = '';
+
+            if (allVessels.length === 0) {
+                g.innerHTML = '<div class="text-center text-gray-500 col-span-full py-10"><i class="fa-solid fa-ship text-4xl mb-3 opacity-30 block"></i>ยังไม่มีเรือในระบบ</div>';
+                return;
+            }
+            if (filteredVessels.length === 0) {
+                const monthName = new Date(filterYear, filterMonth - 1, 1).toLocaleString('th-TH', { month: 'long', year: 'numeric' });
+                g.innerHTML = `<div class="text-center text-slate-500 col-span-full py-14"><i class="fa-solid fa-calendar-xmark text-5xl mb-4 opacity-30 block text-blue-400"></i><p class="text-lg font-bold text-slate-400">ไม่มีเรือในเดือน ${monthName}</p><p class="text-sm text-slate-600 mt-1">ลองเลือกเดือนอื่น หรือกดปุ่ม "ปัจจุบัน"</p></div>`;
+                return;
+            }
+
+            // Pre-compute all stats once to avoid redundant recalculations
+            const _statsCache = new Map();
+            filteredVessels.forEach(v => {
+                _statsCache.set(v.id, {
+                    load: calculateVesselStats(v, 'load'),
+                    discharge: calculateVesselStats(v, 'discharge'),
+                    total: calculateVesselStats(v)
+                });
+            });
+
+            const sortedVessels = [...filteredVessels].sort((a, b) => {
+                const sA = _statsCache.get(a.id).total;
+                const sB = _statsCache.get(b.id).total;
+                const completeA = sA.plan > 0 && sA.remaining <= 0;
+                const completeB = sB.plan > 0 && sB.remaining <= 0;
+                if (completeA !== completeB) return completeA ? 1 : -1;
+                return b.id - a.id;
+            });
+            sortedVessels.forEach(v => {
+                const cached = _statsCache.get(v.id);
+                const sLoad = cached.load;
+                const sDischarge = cached.discharge;
+
+                const hasLoad = sLoad.plan > 0;
+                const hasDischarge = sDischarge.plan > 0;
+
+                let workingCount = 0; let breakCount = 0;
+
+                const vesselDisabledGangs = v.disabledGangs || [];
+                const activeGangs = window.appData.gangs.filter(gang => !vesselDisabledGangs.includes(gang));
+
+                activeGangs.forEach(g => { const gd = window.getGangData(v, g); if (gd.status === 'working') workingCount++; else breakCount++; });
+
+                const sTotal = cached.total;
+                let statusBadge = "";
+                if (sTotal.remaining > 0) {
+                    if (workingCount > 0) statusBadge = `<div class="mt-2 flex gap-2 text-[10px] uppercase font-bold"><span class="bg-green-900/40 text-green-400 border border-green-700/50 px-2 py-0.5 rounded flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Working: ${workingCount}</span>${breakCount > 0 ? `<span class="bg-red-900/40 text-red-400 border border-red-700/50 px-2 py-0.5 rounded flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Break: ${breakCount}</span>` : ''}</div>`;
+                    else statusBadge = `<div class="mt-2 text-[10px] uppercase font-bold"><span class="bg-red-900/40 text-red-400 border border-red-700/50 px-2 py-0.5 rounded flex items-center gap-1 w-fit"><i class="fa-solid fa-mug-hot"></i> ALL BREAK (${breakCount})</span></div>`;
+                }
+
+                let isComplete = (sTotal.plan > 0 && sTotal.remaining <= 0);
+                let completeHtml = '';
+                let cardClass = "bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 cursor-pointer hover:border-blue-500 transition group relative";
+
+                if (isComplete) {
+                    let completeTimeStr = "Unknown";
+                    if (v.logs && v.logs.length > 0) {
+                        const sortedLogs = [...v.logs].sort((a, b) => a.timestamp - b.timestamp);
+                        const lastLog = sortedLogs[sortedLogs.length - 1];
+                        const endMs = lastLog.timestamp;
+                        const d = new Date(endMs);
+                        completeTimeStr = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    cardClass = "bg-slate-800 rounded-xl overflow-hidden shadow-lg border-2 border-green-500 cursor-pointer transition group relative";
+
+                    completeHtml = `
+                    <div class="absolute inset-0 top-[5.5rem] bg-slate-900/95 z-20 flex flex-col items-center justify-center text-center backdrop-blur-sm p-4">
+                        <h3 class="text-3xl font-extrabold text-green-500 mb-2 uppercase tracking-widest drop-shadow-[0_2px_10px_rgba(34,197,94,0.5)]">COMPLETE</h3>
+                        
+                        <div class="text-white text-xs bg-slate-800 px-4 py-1.5 rounded-full border border-green-600/50 shadow-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-flag-checkered text-yellow-400"></i> Finish: ${completeTimeStr}
+                        </div>
+
+                        <!-- Stats for Complete -->
+                        <div class="grid grid-cols-2 gap-3 w-full max-w-[240px]">
+                             <div class="bg-slate-800 p-2 rounded-lg border border-slate-600 shadow-sm">
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1"><i class="fa-regular fa-clock mr-1"></i>Duration</div>
+                                <div class="text-sm font-bold text-white">${sTotal.durationStr}</div>
+                             </div>
+                             <div class="bg-slate-800 p-2 rounded-lg border border-slate-600 shadow-sm">
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1"><i class="fa-solid fa-gauge-high mr-1"></i>Prod</div>
+                                <div class="text-sm font-bold text-yellow-400">${sTotal.shipProduct} <span class="text-[10px] text-slate-500">/hr</span></div>
+                             </div>
+                        </div>
+                    </div>`;
+                }
+
+                let barsHtml = '';
+                const renderBar = (stats, type) => {
+                    const pct = stats.plan > 0 ? Math.round((stats.loaded / stats.plan) * 100) : 0;
+                    const visualPct = Math.max(0, Math.min(100, pct));
+                    const isLoad = type === 'load';
+                    const gradient = isLoad ? "from-blue-600 to-blue-400" : "from-pink-600 to-pink-400";
+                    const badgeColor = isLoad ? "bg-blue-600 border-blue-400" : "bg-pink-600 border-pink-400";
+                    const label = isLoad ? "LOADING (Export)" : "DISCHARGE (Import)";
+                    const labelColor = isLoad ? "text-blue-400" : "text-pink-400";
+                    const icon = isLoad ? "fa-upload" : "fa-download";
+
+                    return `
+                    <div class="mb-3 last:mb-0">
+                        <div class="flex justify-between items-end mb-1">
+                            <div class="text-[10px] font-bold ${labelColor} uppercase"><i class="fa-solid ${icon} mr-1"></i>${label}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">${stats.loaded} / ${stats.plan}</div>
+                        </div>
+                        <div class="relative w-full h-2 bg-slate-700 rounded-full">
+                            <div class="absolute top-0 left-0 h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-1000" style="width: ${visualPct}%"></div>
+                            <div class="absolute top-1/2 -translate-y-1/2 transition-all duration-1000 z-10 flex flex-col items-center" style="left: ${visualPct}%; transform: translate(-50%, -50%);">
+                                <div class="${badgeColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg mb-1 whitespace-nowrap border">${pct}%</div>
+                                <i class="fa-solid fa-ferry text-xl text-white drop-shadow-md" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
+                            </div>
+                        </div>
+                    </div>`;
+                };
+
+                if (hasDischarge) barsHtml += renderBar(sDischarge, 'discharge');
+                if (hasLoad || (!hasDischarge)) barsHtml += renderBar(sLoad, 'load');
+
+                let statsBlockHtml = '<div class="p-4 border-t border-slate-700/50 flex flex-col gap-3">';
+
+                const renderStatsGrid = (stats, title, colorName) => {
+                    return `
+                    <div>
+                        <div class="text-[10px] text-${colorName}-400 font-bold uppercase mb-1 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-${colorName}-500"></span> ${title}
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-700/30 p-1.5 rounded border border-slate-700/50">
+                                <div class="text-[9px] text-slate-400 uppercase">Plan</div>
+                                <div class="font-bold text-white text-sm">${stats.plan}</div>
+                            </div>
+                            <div class="bg-${colorName}-900/20 p-1.5 rounded border border-${colorName}-900/30">
+                                <div class="text-[9px] text-${colorName}-400 uppercase">Done</div>
+                                <div class="font-bold text-${colorName}-300 text-sm">${stats.loaded}</div>
+                            </div>
+                            <div class="bg-orange-900/20 p-1.5 rounded border border-orange-900/30">
+                                <div class="text-[9px] text-orange-400 uppercase">Rem</div>
+                                <div class="font-bold text-orange-300 text-sm">${stats.remaining}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                if (hasDischarge) {
+                    statsBlockHtml += renderStatsGrid(sDischarge, 'DISCHARGE', 'pink');
+                }
+
+                if (hasLoad) {
+                    if (hasDischarge) statsBlockHtml += `<div class="border-t border-slate-700/30"></div>`;
+                    statsBlockHtml += renderStatsGrid(sLoad, 'LOADING', 'green');
+                }
+
+                if (!hasLoad && !hasDischarge) {
+                    statsBlockHtml += renderStatsGrid(sTotal, 'TOTAL', 'green');
+                }
+
+                statsBlockHtml += '</div>';
+
+                // --- NEW STATS SECTION (Duration & Prod) ---
+                const perfHtml = `
+                <div class="flex items-center justify-between px-4 py-2 bg-slate-900/30 border-t border-slate-700/50 text-xs">
+                    <div class="flex items-center gap-2" title="Total Working Time">
+                        <div class="bg-slate-700 p-1 rounded text-slate-300"><i class="fa-regular fa-clock"></i></div>
+                        <span class="text-slate-300">Time: <b class="text-white">${sTotal.durationStr}</b></span>
+                    </div>
+                    <div class="flex items-center gap-2" title="Ship Productivity">
+                        <div class="bg-slate-700 p-1 rounded text-slate-300"><i class="fa-solid fa-gauge-high"></i></div>
+                        <span class="text-slate-300">Prod: <b class="text-yellow-400">${sTotal.shipProduct}</b>/hr</span>
+                    </div>
+                </div>`;
+
+                _gridHtml += `
+                <div onclick="goToDetail(${v.id})" class="${cardClass}">
+                    ${completeHtml}
+                    <div class="p-4 bg-slate-900 border-b border-slate-700 flex justify-between items-start relative z-10">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="bg-blue-600 p-1.5 rounded text-white"><i class="fa-solid fa-ship"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg group-hover:text-blue-400 transition leading-tight">${v.name}</h3>
+                                    <div class="text-xs text-slate-400 font-mono">${v.voy}</div>
+                                </div>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-white">${sTotal.loaded}<span class="text-sm text-slate-500">/${sTotal.plan}</span></div>
+                            <div class="text-xs font-mono text-blue-300 mt-1"><i class="fa-solid fa-clock mr-1"></i>${sTotal.etc}</div>
+                        </div>
+                    </div>
+
+                    <div class="px-5 pt-4 pb-2">
+                        ${barsHtml}
+                    </div>
+
+                    ${perfHtml}
+                    ${statsBlockHtml}
+                </div>`;
+            });
+            g.innerHTML = _gridHtml;
+        }
+
+        // Overview: only re-render when data changed. Detail: update live time every second.
+        setInterval(() => {
+            if (window.currentView === 'overview' && _dataDirty) { _dataDirty = false; renderOverview(); }
+            if (window.currentView === 'detail') window.updateLiveTime();
+        }, 1000);
+    </script>
+</body>
+
+</html>
