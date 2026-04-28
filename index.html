@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</title>
+    <title>ようこそ 2PS SERVICE へ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
@@ -143,13 +143,14 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <nav class="bg-slate-900 border-b border-slate-700 p-4 sticky top-0 z-50 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="goToOverview()">
-                <img src="logo.jpg" alt="2PS 20th Anniversary" class="h-12 w-auto object-contain">
-                <div>
-                    <h1 class="text-xl font-bold tracking-wide">​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</h1>
-                    <div class="text-xs text-slate-400 flex items-center gap-2">
+    <nav class="bg-slate-900 border-b border-slate-700 px-3 py-3 sm:p-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div class="flex items-center gap-3 cursor-pointer min-w-0" onclick="goToOverview()">
+                <img src="logo.jpg" alt="2PS 20th Anniversary" class="h-10 sm:h-12 w-auto object-contain flex-shrink-0">
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-sm sm:text-lg md:text-xl font-bold tracking-wide leading-tight">ようこそ 2PS SERVICE へ</h1>
+                    <p class="text-[10px] sm:text-[11px] text-slate-300 leading-snug mt-0.5">ご利用いただき、誠にありがとうございます。</p>
+                    <div class="text-[10px] sm:text-xs text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
                         <span>Multi-Vessel Operation</span>
                         <span id="connectionStatus"
                             class="text-yellow-500 font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded border border-yellow-900">🟡
@@ -157,13 +158,13 @@
                     </div>
                 </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 w-full sm:w-auto">
                 <button onclick="goToOverview()" id="btn-dash"
-                    class="px-4 py-2 rounded bg-blue-600 text-white text-sm font-bold shadow-lg shadow-blue-500/50 transition transform hover:scale-105">
+                    class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded bg-blue-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/50 transition transform hover:scale-105 whitespace-nowrap">
                     <i class="fa-solid fa-desktop mr-2"></i>Monitor
                 </button>
                 <button onclick="goToAdmin()" id="btn-admin"
-                    class="px-4 py-2 rounded bg-slate-700 text-slate-300 text-sm hover:text-white hover:bg-slate-600 transition">
+                    class="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded bg-slate-700 text-slate-300 text-xs sm:text-sm hover:text-white hover:bg-slate-600 transition whitespace-nowrap">
                     <i class="fa-solid fa-gear mr-2"></i>Setup
                 </button>
             </div>
@@ -176,16 +177,17 @@
         <!-- LOADER & ERROR SCREEN -->
         <div id="app-loader"
             class="fixed inset-0 bg-slate-900 z-40 flex flex-col items-center justify-center text-white text-center p-6">
-            <div id="loader-spinner" class="flex flex-col items-center">
+            <div id="loader-spinner" class="flex flex-col items-center max-w-md w-full">
                 <!-- 20th Anniversary Logo -->
-                <div class="relative mb-8 ship-anim">
+                <div class="relative mb-6 ship-anim">
                     <img src="logo.jpg" alt="2PS 20th Anniversary"
-                        class="h-48 w-auto object-contain drop-shadow-2xl">
+                        class="h-32 sm:h-48 w-auto object-contain drop-shadow-2xl">
                 </div>
 
-                <h2 class="text-2xl font-bold tracking-wider uppercase text-blue-100 mb-2">​ようこそ 2PS SERVICE へ。ご利用いただき、誠にありがとうございます。</h2>
+                <h2 class="text-xl sm:text-2xl font-bold tracking-wide text-blue-100 mb-2 leading-snug">ようこそ 2PS SERVICE へ</h2>
+                <p class="text-sm sm:text-base text-slate-300 mb-4 leading-relaxed px-2">ご利用いただき、誠にありがとうございます。</p>
                 <div
-                    class="flex items-center gap-2 text-slate-400 text-sm font-mono bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                    class="flex items-center gap-2 text-slate-400 text-xs sm:text-sm font-mono bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
                     <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                     Online Operation System
                 </div>
